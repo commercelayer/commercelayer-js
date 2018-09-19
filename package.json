@@ -1,0 +1,28 @@
+{
+  "name": "commercelayer",
+  "version": "1.1.0",
+  "description": "The official Commerce Layer JS library",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commercelayer/commercelayer-js.git"
+  },
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce"
+  ],
+  "author": "Filippo Conforti",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/commercelayer/commercelayer-js/issues"
+  },
+  "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "json-api-normalize": "^1.1.5"
+  }
+}
