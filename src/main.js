@@ -27,12 +27,15 @@ function getOrder() {
 }
 
 function refreshOrder() {
-  getOrder().then(function(order) {
-    if (order.attributes.status == 'placed') {
-      createOrder()
-      getOrder()
-    }
-  })
+  var orderToken = auth.getOrderToken()
+  if (orderToken) {
+    getOrder().then(function(order) {
+      if (order.attributes.status == 'placed') {
+        createOrder()
+        getOrder()
+      }
+    })    
+  }
 }
 
 function getPrices() {
