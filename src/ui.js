@@ -1,5 +1,32 @@
-module.exports = {
+const elements = require('./elements')
 
+module.exports = {
+  enableElement: function(el) {
+    if (el) {
+      el.removeAttribute('disabled')
+    }
+  },
+  disableElement: function(el) {
+    if (el) {
+      el.setAttribute("disabled","disabled")
+    }
+  },
+  setElementHTML(selector, html) {
+    var $el = document.querySelector(selector)
+    if ($el) {
+      $el.innerHTML = html
+    }
+  },
+  displayElement: function(el) {
+    if (el) {
+      el.style.display = 'block'
+    }
+  },
+  hideElement: function(el) {
+    if (el) {
+      el.style.display = 'none'
+    }
+  },
   updatePrices: function(skus) {
     for (var k = 0; k < skus.length; k++) {
       var priceAmount = document.querySelector('[data-sku-code=' + skus[k].code + '] > .amount')
@@ -12,20 +39,21 @@ module.exports = {
       }
     }
   },
-  toggleShoppingBag: function() {
-    document.querySelector('#shopping-bag').classList.toggle("open");
-    document.querySelector('#main').classList.toggle("open");
+  updateAddToBag: function(skuId, skuOptionText) {
+
+    var $addToBag = elements.addToBag
+
+    if ($addToBag) {
+      $addToBag.dataset.skuId = skuId
+      $addToBag.dataset.skuName = $addToBag.dataset.productName + ' (' + skuOptionText + ')'
+      this.enableElement($addToBag)
+    }
   },
-  openShoppingBag: function() {
-    document.querySelector('#shopping-bag').classList.add("open");
-    document.querySelector('#main').classList.add("open");
-  },
-  closeShoppingBag: function() {
-    document.querySelector('#shopping-bag').classList.remove("open");
-    document.querySelector('#main').classList.remove("open");
-  },
-  displayAvailableMessage: function(inventory) {
-    var $availableMessage = document.querySelector('.available-message')
+  updateAvailableMessage: function(inventory) {
+    var $availableMessage = elements.availableMessage
+    var $unavailableMessage = elements.unavailableMessage
+
+    this.hideElement($unavailableMessage)
 
     if ($availableMessage) {
 
@@ -43,53 +71,36 @@ module.exports = {
 
       if (first_level.quantity > 0) {
         first_delivery_lead_time = first_level.delivery_lead_times[0]
-
-        var $availableMessageQty = document.querySelector('.available-message-qty')
-        if ($availableMessageQty) {
-          $availableMessageQty.innerHTML = first_level.quantity
-        }
-
-        var $availableMessageMinDays = document.querySelector('.available-message-min-days')
-        if ($availableMessageMinDays) {
-          $availableMessageMinDays.innerHTML = first_delivery_lead_time.min.days
-        }
-
-        var $availableMessageMaxDays = document.querySelector('.available-message-max-days')
-        if ($availableMessageMaxDays) {
-          $availableMessageMaxDays.innerHTML = first_delivery_lead_time.max.days
-        }
-
-        var $availableMessageShippingPrice = document.querySelector('.available-message-shipping-price')
-        if ($availableMessageShippingPrice) {
-          $availableMessageShippingPrice.innerHTML = first_delivery_lead_time.shipping_method.formatted_price_amount
-        }
-
-        $availableMessage.style.display = 'block'
-
+        this.setElementHTML('.available-message-qty', first_level.quantity)
+        this.setElementHTML('.available-message-min-days', first_delivery_lead_time.min.days)
+        this.setElementHTML('.available-message-max-days', first_delivery_lead_time.max.days)
+        this.setElementHTML('.available-message-shipping-price', first_delivery_lead_time.shipping_method.formatted_price_amount)
+        this.displayElement($availableMessage)
       }
 
     }
-
-    document.querySelector('.unavailable-message').style.display = 'none'
   },
   displayUnavailableMessage: function() {
-    document.querySelector('.available-message').style.display = 'none'
-    document.querySelector('.unavailable-message').style.display = 'block'
+    hideElement(elements.availableMessage)
+    displayElement(elements.unavailableMessage)
+  },
+  toggleShoppingBag: function() {
+    elements.shoppingBag.classList.toggle("open")
+    elements.main.classList.toggle("open")
+  },
+  openShoppingBag: function() {
+    elements.shoppingBag.classList.add("open")
+    elements.main.classList.add("open")
+  },
+  closeShoppingBag: function() {
+    elements.shoppingBag.classList.remove("open")
+    elements.main.classList.remove("open")
   },
   displayShoppingBagUnavailableMessage: function() {
-    document.querySelector('.shopping-bag-unavailable-message').style.display = 'block'
+    displayElement(elements.shoppingBagUnavailableMessage)
   },
   hideShoppingBagUnavailableMessage: function() {
-    document.querySelector('.shopping-bag-unavailable-message').style.display = 'none'
-  },
-  updateAddToBagLink: function(skuId, skuOptionText) {
-    var $addToBag = document.querySelector(".add-to-bag")
-
-    if ($addToBag) {
-      $addToBag.dataset.skuId = skuId
-      $addToBag.dataset.skuName = $addToBag.dataset.productName + ' (' + skuOptionText + ')'
-      $addToBag.removeAttribute('disabled')
-    }
+    hideElement(elements.shoppingBagUnavailableMessage)
   },
   addTableColText: function(tableRow, text, className) {
     var tableCol = document.createElement('td')

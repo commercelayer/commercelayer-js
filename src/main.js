@@ -1,13 +1,15 @@
+const elements = require('./elements')
 const axios = require('axios')
 const normalize = require('json-api-normalize')
 const config = require('./config')
 const utils = require('./utils')
 const auth = require('./auth')
 const ui = require('./ui')
+const listeners = require('./listeners')
 
 function getPrices() {
 
-  var $prices = Array.prototype.slice.call(document.querySelectorAll('.price'), 0);
+  var $prices = elements.prices
 
   if ($prices.length > 0) {
 
@@ -50,6 +52,42 @@ function getPrices() {
   }
 }
 
+function getVariants() {
+
+  ui.disableElement(elements.addToBag)
+
+  var $variants = elements.variants
+
+  if ($variants.length > 0) {
+
+    var skuCodes = []
+
+    $variants.forEach(function (variant) {
+      ui.disableElement(variant)
+      skuCodes.push(variant.dataset.skuCode)
+    })
+
+    axios
+      .get('/api/skus?filter[codes]=' + skuCodes.join(','))
+      .then(function(response) {
+        var skus = normalize(response.data).get([
+          'id',
+          'code'
+        ])
+
+        for (var i = 0; i < skus.length; i++) {
+
+          var variant = document.querySelector('.variant[data-sku-code=' + skus[i].code + ']')
+          if (variant) {
+            variant.value = skus[i].id
+            ui.enableElement(variant)
+          }
+
+        }
+      })
+
+  }
+}
 
 function getOrder() {
   return axios
@@ -77,77 +115,13 @@ function refreshOrder() {
   }
 }
 
-function getVariants() {
-
-  var $variants = Array.prototype.slice.call(document.querySelectorAll('.variant'), 0);
-
-  if ($variants.length > 0) {
-
-    var skuCodes = []
-
-    $variants.forEach(function ($variant) {
-      skuCodes.push($variant.dataset.skuCode)
-    })
-
-    axios
-      .get('/api/skus?filter[codes]=' + skuCodes.join(','))
-      .then(function(response) {
-        var skus = normalize(response.data).get([
-          'id',
-          'code'
-        ])
-
-        for (var i = 0; i < skus.length; i++) {
-
-          var variant = document.querySelector('.variant[data-sku-code=' + skus[i].code + ']')
-          if (variant) {
-            variant.value = skus[i].id
-            variant.removeAttribute('disabled')
-          }
-
-        }
-      })
-
-  }
-}
-
-function getInventory() {
-
-  var $variantSelect = document.querySelector('.variant-select')
-
-  if ($variantSelect) {
-
-    $variantSelect.addEventListener('change', function () {
-
-      var skuId = this.value
-      var skuOptionText = this.options[this.selectedIndex].text;
-
-      axios
-        .get('/api/skus/' + skuId)
-        .then(function(response) {
-          var sku = normalize(response.data).get([
-            'id',
-            'inventory'
-          ])
-
-          if (sku.inventory.available) {
-            ui.updateAddToBagLink(skuId, skuOptionText)
-            ui.displayAvailableMessage(sku.inventory)
-          }
-        })
-
-    })
-
-  }
-
-}
-
 function getShoppingBag() {
   var orderToken = utils.getCookie('order_token_' + countryCode)
 }
 
 function setupAddToShoppingBag() {
-  var $addToBag = document.querySelector(".add-to-bag")
+  var $addToBag = elements.addToBag
+
   if ($addToBag) {
     $addToBag.addEventListener('click', function(event){
       event.preventDefault()
@@ -426,9 +400,10 @@ function updateLineItemQty(lineItemId, quantity) {
 
 exports.init = function() {
   getPrices()
+  getVariants()
+  listeners.updateVariantSelect()
 
   // refreshOrder()
-  // getVariants()
   // getInventory()
   // setupAddToShoppingBag()
   // setupShoppingBagToggle()
