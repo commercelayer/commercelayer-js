@@ -18,7 +18,6 @@ function getAccessToken() {
 // axios defaults
 axios.defaults.baseURL = config.baseUrl()
 axios.defaults.headers.common['Accept'] = 'application/vnd.api+json'
-axios.defaults.headers.common['Content-Type'] = 'application/vnd.api+json'
 
 // axios interceptors
 axios.interceptors.request.use(function (requestConfig) {

@@ -1,4 +1,5 @@
 const elements = require('./elements')
+const normalize = require('json-api-normalize')
 
 module.exports = {
   enableElement: function(el) {
@@ -80,27 +81,158 @@ module.exports = {
 
     }
   },
+
+  updateShoppingBagPreview: function(order) {
+    var $shoppingBagPreviewCount = elements.shoppingBagPreviewCount
+    if ($shoppingBagPreviewCount) {
+      $shoppingBagPreviewCount.innerHTML = order.attributes.skus_count
+    }
+    var $shoppingBagPreviewTotal = elements.shoppingBagPreviewTotal
+    if ($shoppingBagPreviewTotal) {
+      $shoppingBagPreviewTotal.innerHTML = order.attributes.formatted_total_amount_with_taxes
+    }
+  },
+
+  updateShoppingBagTable: function(order) {
+    var $shoppingBagTable = elements.shoppingBagTable
+    if ($shoppingBagTable) {
+
+      var normalized_order = normalize(order).get([
+        'id',
+        'formatted_subtotal_amount',
+        'formatted_discount_amount',
+        'formatted_shipping_amount',
+        'formatted_payment_method_amount',
+        'formatted_total_tax_amount',
+        'formatted_total_amount_with_taxes',
+        'line_items.id',
+        'line_items.item_type',
+        'line_items.image_url',
+        'line_items.name',
+        'line_items.quantity',
+        'line_items.formatted_unit_amount',
+        'line_items.formatted_total_amount'
+      ])[0]
+
+      if (normalized_order.line_items) {
+
+        $shoppingBagTable.innerHTML = ''
+
+        for (var i = 0; i < normalized_order.line_items.length; i++) {
+
+          var line_item = normalized_order.line_items[i]
+
+          if (line_item.item_type == "skus") {
+
+            var tableRow = document.createElement('tr')
+
+            this.addTableColImage(tableRow, line_item.image_url, 'shopping-bag-col-image')
+
+            this.addTableColText(tableRow, line_item.name, 'shopping-bag-col-name')
+
+            var quantitySelect = document.createElement('select')
+            quantitySelect.dataset.lineItemId = line_item.id
+
+            for (var qty = 1; qty <= 10; qty++) {
+                var option = document.createElement("option");
+                option.value = qty;
+                option.text = qty;
+                if (qty == line_item.quantity) {
+                  option.selected = true
+                }
+                quantitySelect.appendChild(option);
+            }
+
+            quantitySelect.addEventListener('change', function(event){
+              updateLineItemQty(this.dataset.lineItemId, this.value)
+            })
+
+
+            this.addTableColElement(tableRow, quantitySelect, 'shopping-bag-col-qty')
+
+
+            this.addTableColText(tableRow, line_item.formatted_total_amount, 'shopping-bag-col-total')
+
+            // remove
+            var removeLink = document.createElement('a')
+            var removeLinkText = document.createTextNode('X')
+            removeLink.appendChild(removeLinkText)
+            removeLink.dataset.lineItemId = line_item.id
+
+            removeLink.addEventListener('click', function(event){
+              event.preventDefault()
+              this.parentElement.parentElement.remove()
+              // api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
+              //   api.getOrder()
+              // })
+            })
+            this.addTableColElement(tableRow, removeLink, 'shopping-bag-col-remove')
+
+
+            $shoppingBagTable.appendChild(tableRow)
+
+          }
+        }
+      }
+
+    }
+  },
+  updateShoppingBagCheckout: function(order) {
+    var $shoppingBagCheckout = elements.shoppingBagCheckout
+    if ($shoppingBagCheckout) {
+      var normalized_order = normalize(order).get([
+        'line_items.id',
+        'checkout_url'
+      ])[0]
+
+      if (normalized_order.line_items) {
+        $shoppingBagCheckout.removeAttribute('disabled')
+        $shoppingBagCheckout.href = normalized_order.checkout_url
+      } else {
+        $shoppingBagCheckout.setAttribute('disabled', '')
+      }
+    }
+  },
+
   displayUnavailableMessage: function() {
-    hideElement(elements.availableMessage)
-    displayElement(elements.unavailableMessage)
+    this.hideElement(elements.availableMessage)
+    this.displayElement(elements.unavailableMessage)
   },
   toggleShoppingBag: function() {
-    elements.shoppingBag.classList.toggle("open")
-    elements.main.classList.toggle("open")
+    $shoppingBag = elements.shoppingBag
+    if ($shoppingBag) {
+      $shoppingBag.classList.toggle("open")
+    }
+    $main = elements.main
+    if ($main) {
+      $main.classList.toggle("open")
+    }
   },
   openShoppingBag: function() {
-    elements.shoppingBag.classList.add("open")
-    elements.main.classList.add("open")
+    $shoppingBag = elements.shoppingBag
+    if ($shoppingBag) {
+      $shoppingBag.classList.add("open")
+    }
+    $main = elements.main
+    if ($main) {
+      $main.classList.add("open")
+    }
   },
   closeShoppingBag: function() {
-    elements.shoppingBag.classList.remove("open")
-    elements.main.classList.remove("open")
+    $shoppingBag = elements.shoppingBag
+    if ($shoppingBag) {
+      $shoppingBag.classList.remove("open")
+    }
+    $main = elements.main
+    if ($main) {
+      $main.classList.remove("open")
+    }
   },
   displayShoppingBagUnavailableMessage: function() {
-    displayElement(elements.shoppingBagUnavailableMessage)
+    this.displayElement(elements.shoppingBagUnavailableMessage)
   },
   hideShoppingBagUnavailableMessage: function() {
-    hideElement(elements.shoppingBagUnavailableMessage)
+    this.hideElement(elements.shoppingBagUnavailableMessage)
   },
   addTableColText: function(tableRow, text, className) {
     var tableCol = document.createElement('td')
