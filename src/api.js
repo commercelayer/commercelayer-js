@@ -245,15 +245,18 @@ module.exports = {
                 if (qty == line_item.quantity) {
                   option.selected = true
                 }
-                quantitySelect.appendChild(option);
+                quantitySelect.appendChild(option)
             }
 
             quantitySelect.addEventListener('change', function(event){
               api.updateLineItemQty(this.dataset.lineItemId, this.value)
             })
 
+            var quantitySelectWrap = document.createElement('div')
+            quantitySelectWrap.classList.add('select')
+            quantitySelectWrap.appendChild(quantitySelect)
 
-            ui.addTableColElement(tableRow, quantitySelect, 'shopping-bag-col-qty')
+            ui.addTableColElement(tableRow, quantitySelectWrap, 'shopping-bag-col-qty')
 
 
             ui.addTableColText(tableRow, line_item.formatted_total_amount, 'shopping-bag-col-total')
