@@ -81,11 +81,30 @@ module.exports = {
               variant.value = skus[i].id
               ui.enableElement(variant)
             }
+            if (variant.tagName === 'INPUT') {
+              module.exports.getSingleVariant(variant)
+            }
 
           }
         })
 
     }
+  },
+  getSingleVariant      : function (variant) {
+
+    var skuId = variant.value
+
+    axios
+      .get('/api/skus/' + skuId + '?fields[skus]=inventory')
+      .then(function (response) {
+        var sku = response.data.data
+
+        if (sku.attributes.inventory.available) {
+          ui.updateAddToBag(skuId, null)
+          ui.updateAvailableMessage(sku.attributes.inventory)
+        }
+      })
+
   },
   createOrder: function() {
     return axios

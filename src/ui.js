@@ -46,7 +46,8 @@ module.exports = {
 
     if ($addToBag) {
       $addToBag.dataset.skuId = skuId
-      $addToBag.dataset.skuName = $addToBag.dataset.productName + ' (' + skuOptionText + ')'
+      $addToBag.dataset.skuName = $addToBag.dataset.productName
+      $addToBag.dataset.skuName += skuOptionText ? ' (' + skuOptionText + ')' : ''
       this.enableElement($addToBag)
     }
   },
