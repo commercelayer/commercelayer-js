@@ -1,10 +1,11 @@
 {
   "name": "commercelayer",
-  "version": "1.1.6",
-  "description": "The official Commerce Layer JS library",
+  "version": "1.1.7",
+  "description": "The Official Commerce Layer JS library",
   "main": "./src/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -13,7 +14,8 @@
   "keywords": [
     "jamstack",
     "headless",
-    "ecommerce"
+    "ecommerce",
+    "api"
   ],
   "author": "Filippo Conforti",
   "license": "MIT",
@@ -24,5 +26,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "json-api-normalize": "^1.1.5"
+  },
+  "devDependencies": {
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2"
   }
 }

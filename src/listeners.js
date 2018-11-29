@@ -1,7 +1,6 @@
 const elements = require('./elements')
 const axios = require('axios')
 const auth = require('./auth')
-
 const ui = require('./ui')
 const api = require('./api')
 const utils = require('./utils')
@@ -9,21 +8,15 @@ const utils = require('./utils')
 module.exports = {
   setVariantSelect: function() {
 
-    var $variantSelect = document.querySelector('.variant-select')
+    var $variantSelect = elements.variantSelect
 
     if ($variantSelect) {
-      $variantSelect.addEventListener('change', function () {
-        var skuId = this.value
-        var skuOptionText = this.options[this.selectedIndex].text;
-        axios
-          .get('/api/skus/' + skuId + '?fields[skus]=inventory')
-          .then(function(response) {
-            var sku = response.data.data
-            if (sku.attributes.inventory.available) {
-              ui.updateAddToBag(skuId, skuOptionText)
-              ui.updateAvailableMessage(sku.attributes.inventory)
-            }
-          })
+      $variantSelect.addEventListener('change', api.getInventory($variantSelect.value, $variantSelect.options[this.selectedIndex].dataset.skuName))
+    } else { // radio
+      $variants = elements.variants
+      $variants.forEach(function (variant) {
+        console.log(variant)
+        variant.addEventListener('click', api.getInventory(variant.value, variant.dataset.skuName))
       })
     }
   },

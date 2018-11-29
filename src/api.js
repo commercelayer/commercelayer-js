@@ -26,6 +26,8 @@ module.exports = {
         'code',
         'prices.formatted_amount',
         'prices.formatted_compare_at_amount',
+        'prices.amount_cents',
+        'prices.compare_at_amount_cents'
       ]
 
       axios
@@ -76,16 +78,28 @@ module.exports = {
 
           for (var i = 0; i < skus.length; i++) {
 
-            var variant = document.querySelector('.variant[data-sku-code=' + skus[i].code + ']')
+            var variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
             if (variant) {
               variant.value = skus[i].id
               ui.enableElement(variant)
+              if (skus.length == 1) {
+                module.exports.getInventory(variant.value, variant.dataset.skuName)
+              }
             }
-
           }
         })
-
     }
+  },
+  getInventory: function(skuId, skuName) {
+    axios
+      .get('/api/skus/' + skuId + '?fields[skus]=inventory')
+      .then(function(response) {
+        var sku = response.data.data
+        if (sku.attributes.inventory.available) {
+          ui.updateAddToBag(skuId, skuName)
+          ui.updateAvailableMessage(sku.attributes.inventory)
+        }
+      })
   },
   createOrder: function() {
     return axios
@@ -116,6 +130,7 @@ module.exports = {
       this.getOrder().then(function(order) {
         if (order && order.attributes.status == 'placed') {
           utils.deleteOrderToken()
+          ui.clearShoppingBag()
         }
       })
     }
@@ -197,10 +212,10 @@ module.exports = {
     })
 
   },
-  updateShoppingBagTable: function(order) {
+  updateShoppingBagItems: function(order) {
     var api = this
-    var $shoppingBagTable = elements.shoppingBagTable
-    if ($shoppingBagTable) {
+    var $shoppingBagItemsContainer = elements.shoppingBagItemsContainer
+    if ($shoppingBagItemsContainer) {
 
       var normalized_order = normalize(order).get([
         'id',
@@ -221,7 +236,7 @@ module.exports = {
 
       if (normalized_order.line_items) {
 
-        $shoppingBagTable.innerHTML = ''
+        $shoppingBagItemsContainer.innerHTML = ''
 
         for (var i = 0; i < normalized_order.line_items.length; i++) {
 
@@ -229,56 +244,65 @@ module.exports = {
 
           if (line_item.item_type == "skus") {
 
-            var tableRow = document.createElement('tr')
+            $shoppingBagItemTemplate = elements.shoppingBagItemTemplate
 
-            ui.addTableColImage(tableRow, line_item.image_url, 'shopping-bag-col-image')
+            if ($shoppingBagItemTemplate) {
 
-            ui.addTableColText(tableRow, line_item.name, 'shopping-bag-col-name')
+              if ($shoppingBagItemTemplate.tagName == "TEMPLATE") {
+                $shoppingBagItem = $shoppingBagItemTemplate.content.cloneNode(true)
+              } else {
+                $shoppingBagItem = $shoppingBagItemTemplate.cloneNode(true)
+              }
 
-            var quantitySelect = document.createElement('select')
-            quantitySelect.dataset.lineItemId = line_item.id
+              // image
+              $shoppingBagItemImage = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-image')
+              $shoppingBagItemImage.src = line_item.image_url
 
-            for (var qty = 1; qty <= 10; qty++) {
-                var option = document.createElement("option");
-                option.value = qty;
-                option.text = qty;
-                if (qty == line_item.quantity) {
-                  option.selected = true
-                }
-                quantitySelect.appendChild(option)
-            }
+              // name
+              $shoppingBagItemName = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-name')
+              $shoppingBagItemName.innerHTML = line_item.name
 
-            quantitySelect.addEventListener('change', function(event){
-              api.updateLineItemQty(this.dataset.lineItemId, this.value)
-            })
+              // qty
+              $shoppingBagItemQtyContainer = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-qty-container')
+              $qtySelect = document.createElement('select')
+              $qtySelect.dataset.lineItemId = line_item.id
 
-            var quantitySelectWrap = document.createElement('div')
-            quantitySelectWrap.classList.add('select')
-            quantitySelectWrap.appendChild(quantitySelect)
+              for (var qty = 1; qty <= 10; qty++) {
+                  $option = document.createElement("option")
+                  $option.value = qty
+                  $option.text = qty
+                  if (qty == line_item.quantity) {
+                    $option.selected = true
+                  }
+                  $qtySelect.appendChild($option)
+              }
 
-            ui.addTableColElement(tableRow, quantitySelectWrap, 'shopping-bag-col-qty')
-
-
-            ui.addTableColText(tableRow, line_item.formatted_total_amount, 'shopping-bag-col-total')
-
-            // remove
-            var removeLink = document.createElement('a')
-            var removeLinkText = document.createTextNode('X')
-            removeLink.appendChild(removeLinkText)
-            removeLink.dataset.lineItemId = line_item.id
-
-            removeLink.addEventListener('click', function(event){
-              event.preventDefault()
-              this.parentElement.parentElement.remove()
-              api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
-                api.getOrder()
+              $qtySelect.addEventListener('change', function(event){
+                api.updateLineItemQty(this.dataset.lineItemId, this.value)
               })
-            })
-            ui.addTableColElement(tableRow, removeLink, 'shopping-bag-col-remove')
+              $shoppingBagItemQtyContainer.appendChild($qtySelect)
 
+              // unit_amount
+              $shoppingBagItemUnitAmount = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-unit-amount')
+              $shoppingBagItemUnitAmount.innerHTML = line_item.formatted_unit_amount
 
-            $shoppingBagTable.appendChild(tableRow)
+              // total_amount
+              $shoppingBagItemTotalAmount = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-total-amount')
+              $shoppingBagItemTotalAmount.innerHTML = line_item.formatted_total_amount
 
+              // remove
+              $shoppingBagItemRemove = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-remove')
+              $shoppingBagItemRemove.dataset.lineItemId = line_item.id
+              $shoppingBagItemRemove.addEventListener('click', function(event){
+                event.preventDefault()
+                api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
+                  api.getOrder()
+                })
+              })
+
+              $shoppingBagItemsContainer.appendChild($shoppingBagItem)
+
+            }
           }
         }
       }
@@ -293,7 +317,7 @@ module.exports = {
       .get('/api/orders?include=line_items&filter[token]=' + utils.getOrderToken())
       .then(function(response) {
         if (response.data.data.length > 0) {
-          api.updateShoppingBagTable(response.data)
+          api.updateShoppingBagItems(response.data)
           ui.hideShoppingBagUnavailableMessage()
           ui.updateShoppingBagPreview(response.data.data[0])
           ui.updateShoppingBagCheckout(response.data)

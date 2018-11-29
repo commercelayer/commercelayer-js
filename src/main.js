@@ -1,12 +1,13 @@
 const api = require('./api')
 const listeners = require('./listeners')
+const utils = require('./utils')
 
 exports.init = function() {
-  api.refreshOrder()
   api.getPrices()
   api.getVariants()
   listeners.setVariantSelect()
   listeners.setAddToShoppingBag()
   listeners.setShoppingBagToggle()
   listeners.setShoppingBagClose()
+  api.refreshOrder()
 }

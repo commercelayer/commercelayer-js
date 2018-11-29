@@ -30,23 +30,25 @@ module.exports = {
   },
   updatePrices: function(skus) {
     for (var k = 0; k < skus.length; k++) {
-      var priceAmount = document.querySelector('[data-sku-code=' + skus[k].code + '] > .amount')
+      var priceAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .amount')
       if (priceAmount) {
         priceAmount.innerHTML = skus[k].prices[0].formatted_amount
       }
-      var priceCompareAmount = document.querySelector('[data-sku-code=' + skus[k].code + '] > .compare-at-amount')
+      var priceCompareAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .compare-at-amount')
       if (priceCompareAmount) {
-        priceCompareAmount.innerHTML = skus[k].prices[0].formatted_compare_at_amount
+        if (skus[k].prices[0].compare_at_amount_cents > skus[k].prices[0].amount_cents) {
+          priceCompareAmount.innerHTML = skus[k].prices[0].formatted_compare_at_amount
+        }
       }
     }
   },
-  updateAddToBag: function(skuId, skuOptionText) {
+  updateAddToBag: function(skuId, skuName) {
 
     var $addToBag = elements.addToBag
 
     if ($addToBag) {
       $addToBag.dataset.skuId = skuId
-      $addToBag.dataset.skuName = $addToBag.dataset.productName + ' (' + skuOptionText + ')'
+      $addToBag.dataset.skuName = skuName
       this.enableElement($addToBag)
     }
   },
@@ -81,7 +83,6 @@ module.exports = {
 
     }
   },
-
   updateShoppingBagPreview: function(order) {
     var $shoppingBagPreviewCount = elements.shoppingBagPreviewCount
     if ($shoppingBagPreviewCount) {
@@ -114,9 +115,9 @@ module.exports = {
     this.displayElement(elements.unavailableMessage)
   },
   toggleShoppingBag: function() {
-    $shoppingBag = elements.shoppingBag
-    if ($shoppingBag) {
-      $shoppingBag.classList.toggle("open")
+    $shoppingBagContainer = elements.shoppingBagContainer
+    if ($shoppingBagContainer) {
+      $shoppingBagContainer.classList.toggle("open")
     }
     $main = elements.main
     if ($main) {
@@ -124,9 +125,9 @@ module.exports = {
     }
   },
   openShoppingBag: function() {
-    $shoppingBag = elements.shoppingBag
-    if ($shoppingBag) {
-      $shoppingBag.classList.add("open")
+    $shoppingBagContainer = elements.shoppingBagContainer
+    if ($shoppingBagContainer) {
+      $shoppingBagContainer.classList.add("open")
     }
     $main = elements.main
     if ($main) {
@@ -134,14 +135,17 @@ module.exports = {
     }
   },
   closeShoppingBag: function() {
-    $shoppingBag = elements.shoppingBag
-    if ($shoppingBag) {
-      $shoppingBag.classList.remove("open")
+    $shoppingBagContainer = elements.shoppingBagContainer
+    if ($shoppingBagContainer) {
+      $shoppingBagContainer.classList.remove("open")
     }
     $main = elements.main
     if ($main) {
       $main.classList.remove("open")
     }
+  },
+  clearShoppingBag: function() {
+    elements.shoppingBagItemsContainer.innerHTML = '';
   },
   displayShoppingBagUnavailableMessage: function() {
     this.displayElement(elements.shoppingBagUnavailableMessage)

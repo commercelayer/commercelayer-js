@@ -2,6 +2,10 @@ const axios = require('axios')
 const config = require('./config')
 const utils = require('./utils')
 
+function accessTokenCookieName() {
+  return 'access_token_${config.clientId()}_${config.marketId()}'
+}
+
 function getAccessToken() {
   return axios
     .post('/oauth/token', {
@@ -10,7 +14,7 @@ function getAccessToken() {
       scope: "market:" + config.marketId()
     })
     .then(function (response) {
-      utils.setCookie('access_token_' + config.marketId(), response.data.access_token, response.data.expires_in)
+      utils.setCookie(accessTokenCookieName(), response.data.access_token, response.data.expires_in)
       return response.data.access_token
     })
 }
@@ -21,7 +25,7 @@ axios.defaults.headers.common['Accept'] = 'application/vnd.api+json'
 
 // axios interceptors
 axios.interceptors.request.use(function (requestConfig) {
-  requestConfig.headers.Authorization = 'Bearer ' + utils.getCookie('access_token_' + config.marketId())
+  requestConfig.headers.Authorization = 'Bearer ' + utils.getCookie(accessTokenCookieName())
   return requestConfig
 }, function (error) {
   return Promise.reject(error)

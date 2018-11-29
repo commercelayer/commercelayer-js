@@ -1,56 +1,31 @@
+const elements = require('./elements')
+
 module.exports = {
   baseUrl: function() {
-    var $baseUrl = document.querySelector('#commercelayer[data-base-url]')
-    if ($baseUrl) {
-      return $baseUrl.dataset.baseUrl
-    }
+    return elements.config.dataset.baseUrl
   },
   clientId: function() {
-    var $cliendId = document.querySelector('#commercelayer[data-client-id]')
-    if ($cliendId) {
-      return $cliendId.dataset.clientId
-    }
+    return elements.config.dataset.clientId
   },
   marketId: function() {
-    var $market = document.querySelector('#commercelayer[data-market-id]')
-    if ($market) {
-      return $market.dataset.marketId
-    }
+    return elements.config.dataset.marketId
   },
   countryCode: function() {
-    var $country = document.querySelector('#commercelayer[data-country-code]')
-    if ($country) {
-      return $country.dataset.countryCode
-    }
+    return elements.config.dataset.countryCode
   },
   languageCode: function() {
-    var $language = document.querySelector('#commercelayer[data-language-code]')
-    if ($language) {
-      return $language.dataset.languageCode.split("-")[0]
-    }
+    return elements.config.dataset.languageCode.split("-")[0]
   },
   cartUrl: function() {
-    var $cartUrl = document.querySelector('#commercelayer[data-cart-url]')
-    if ($cartUrl) {
-      return $cartUrl.dataset.cartUrl
-    }
+    return elements.config.dataset.cartUrl
   },
   returnUrl: function() {
-    var $returnUrl = document.querySelector('#commercelayer[data-return-url]')
-    if ($returnUrl) {
-      return $returnUrl.dataset.cartUrl
-    }
+    return elements.config.dataset.returnUrl
   },
   privacyUrl: function() {
-    var $privacyUrl = document.querySelector('#commercelayer[data-privacy-url]')
-    if ($privacyUrl) {
-      return $privacyUrl.dataset.privacyUrl
-    }
+    return elements.config.dataset.privacyUrl
   },
   termsUrl: function() {
-    var $termsUrl = document.querySelector('#commercelayer[data-terms-url]')
-    if ($termsUrl) {
-      return $termsUrl.dataset.termsUrl
-    }
+    return elements.config.dataset.termsUrl
   }
 }
