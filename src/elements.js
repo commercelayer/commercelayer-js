@@ -1,24 +1,24 @@
 module.exports = {
-  addToBag: document.querySelector(".clayer-add-to-bag"),
-  availableMessage: document.querySelector('.clayer-available-message'),
   config: document.querySelector('#clayer-config'),
   main: document.querySelector('#clayer-main'),
   prices: Array.prototype.slice.call(document.querySelectorAll('.clayer-price'), 0),
-
+  variants: Array.prototype.slice.call(document.querySelectorAll('.clayer-variant'), 0),
+  variantSelect: document.querySelector('.clayer-variant-select'),
+  availabilityMessageContainer: document.querySelector('#clayer-availability-message-container'),
+  availabilityMessageAvailableTemplate: document.querySelector('#clayer-availability-message-available-template'),
+  availabilityMessageUnavailableTemplate: document.querySelector('#clayer-availability-message-unavailable-template'),
+  addToBag: document.querySelector(".clayer-add-to-bag"),
   shoppingBagContainer: document.querySelector('#clayer-shopping-bag-container'),
   shoppingBagItemsContainer: document.querySelector('#clayer-shopping-bag-items-container'),
   shoppingBagItemTemplate: document.querySelector('#clayer-shopping-bag-item-template'),
-
+  shoppingBagItemsCount: document.querySelector('#clayer-shopping-bag-items-count'),
+  shoppingBagSubtotal: document.querySelector('#clayer-shopping-bag-subtotal'),
+  shoppingBagShipping: document.querySelector('#clayer-shopping-bag-shipping'),
+  shoppingBagPayment: document.querySelector('#clayer-shopping-bag-payment'),
+  shoppingBagTaxes: document.querySelector('#clayer-shopping-bag-taxes'),
+  shoppingBagTotal: document.querySelector('#clayer-shopping-bag-total'),
   shoppingBagCheckout: document.querySelector('#clayer-shopping-bag-checkout'),
   shoppingBagClose: document.querySelector('#clayer-shopping-bag-close'),
-
-  shoppingBagPreviewCount: document.querySelector('#clayer-shopping-bag-preview-count'),
-  shoppingBagPreviewTotal: document.querySelector('#clayer-shopping-bag-preview-total'),
   shoppingBagToggle: document.querySelector('#clayer-shopping-bag-toggle'),
-
-  shoppingBagUnavailableMessage: document.querySelector('.clayer-shopping-bag-unavailable-message'),
-  unavailableMessage: document.querySelector('.clayer-unavailable-message'),
-  variants: Array.prototype.slice.call(document.querySelectorAll('.clayer-variant'), 0),
-
-  variantSelect: document.querySelector('.clayer-variant-select')
+  shoppingBagUnavailableMessage: document.querySelector('.clayer-shopping-bag-unavailable-message')
 }

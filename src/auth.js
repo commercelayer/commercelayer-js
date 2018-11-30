@@ -2,10 +2,6 @@ const axios = require('axios')
 const config = require('./config')
 const utils = require('./utils')
 
-function accessTokenCookieName() {
-  return 'access_token_${config.clientId()}_${config.marketId()}'
-}
-
 function getAccessToken() {
   return axios
     .post('/oauth/token', {
@@ -14,7 +10,7 @@ function getAccessToken() {
       scope: "market:" + config.marketId()
     })
     .then(function (response) {
-      utils.setCookie(accessTokenCookieName(), response.data.access_token, response.data.expires_in)
+      utils.setAccessTokenCookie(response.data.access_token, response.data.expires_in)
       return response.data.access_token
     })
 }
@@ -25,7 +21,7 @@ axios.defaults.headers.common['Accept'] = 'application/vnd.api+json'
 
 // axios interceptors
 axios.interceptors.request.use(function (requestConfig) {
-  requestConfig.headers.Authorization = 'Bearer ' + utils.getCookie(accessTokenCookieName())
+  requestConfig.headers.Authorization = 'Bearer ' + utils.getAccessTokenCookie()
   return requestConfig
 }, function (error) {
   return Promise.reject(error)
@@ -35,7 +31,8 @@ axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
   if (error.response.status === 401) {
-    if (error.response.data.errors[0].code == "INVALID_TOKEN") {
+    if (utils.getAccessTokenRetryLockCookie() == undefined) {
+      utils.setAccessTokenRetryLockCookie()
       return getAccessToken().then(function(accessToken) {
         error.config.headers.Authorization = 'Bearer ' + accessToken
         return axios.request(error.config)

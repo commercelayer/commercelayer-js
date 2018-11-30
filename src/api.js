@@ -9,19 +9,19 @@ const ui = require('./ui')
 module.exports = {
   getPrices: function() {
 
-    var $prices = elements.prices
+    $prices = elements.prices
 
     if ($prices.length > 0) {
 
-      var skuCodes = []
+      skuCodes = []
 
       $prices.forEach(function ($price) {
         skuCodes.push($price.dataset.skuCode)
       })
 
-      var skus = []
-      var skusEndpoint = '/api/skus?filter[codes]=' + skuCodes.join(',') +'&include=prices&page[size]=25'
-      var skuAttributes = [
+      skus = []
+      skusEndpoint = '/api/skus?filter[codes]=' + skuCodes.join(',') +'&include=prices&page[size]=25'
+      skuAttributes = [
         'id',
         'code',
         'prices.formatted_amount',
@@ -36,12 +36,12 @@ module.exports = {
 
           ui.updatePrices(normalize(response.data).get(skuAttributes))
 
-          var pageCount = response.data.meta.page_count
+          pageCount = response.data.meta.page_count
 
           if (pageCount > 1) {
-            for (var p=2; p<=pageCount; p++ ) {
+            for (p=2; p<=pageCount; p++ ) {
 
-              var skusEndpointWithPage = skusEndpoint + '&page[number]=' + p
+              skusEndpointWithPage = skusEndpoint + '&page[number]=' + p
 
               axios
                 .get(skusEndpointWithPage)
@@ -57,11 +57,11 @@ module.exports = {
 
     ui.disableElement(elements.addToBag)
 
-    var $variants = elements.variants
+    $variants = elements.variants
 
     if ($variants.length > 0) {
 
-      var skuCodes = []
+      skuCodes = []
 
       $variants.forEach(function (variant) {
         ui.disableElement(variant)
@@ -71,19 +71,19 @@ module.exports = {
       axios
         .get('/api/skus?filter[codes]=' + skuCodes.join(','))
         .then(function(response) {
-          var skus = normalize(response.data).get([
+          skus = normalize(response.data).get([
             'id',
             'code'
           ])
 
-          for (var i = 0; i < skus.length; i++) {
+          for (i = 0; i < skus.length; i++) {
 
-            var variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
+            variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
             if (variant) {
               variant.value = skus[i].id
               ui.enableElement(variant)
-              if (skus.length == 1) {
-                module.exports.getInventory(variant.value, variant.dataset.skuName)
+              if (i == 0) {
+                module.exports.selectVariant(variant)
               }
             }
           }
@@ -94,12 +94,34 @@ module.exports = {
     axios
       .get('/api/skus/' + skuId + '?fields[skus]=inventory')
       .then(function(response) {
-        var sku = response.data.data
+        sku = response.data.data
+        ui.updateAvailabilityMessage(sku.attributes.inventory)
         if (sku.attributes.inventory.available) {
-          ui.updateAddToBag(skuId, skuName)
-          ui.updateAvailableMessage(sku.attributes.inventory)
+          ui.updateAddToBagSKU(skuId, skuName)
+          ui.enableAddToBag()
+        } else {
+          ui.disableAddToBag()
         }
       })
+  },
+  selectVariant: function(variant) {
+    switch(variant.tagName) {
+      case "INPUT":
+        switch(variant.type) {
+          case "radio":
+            variant.click()
+            break
+          case "hidden":
+            module.exports.getInventory(variant.value, variant.dataset.skuName)
+            break
+        }
+        break
+      case "OPTION":
+        $select = variant.parentNode
+        $select.value = variant.value
+        $select.dispatchEvent(new Event('change'))
+        break
+    }
   },
   createOrder: function() {
     return axios
@@ -213,11 +235,11 @@ module.exports = {
 
   },
   updateShoppingBagItems: function(order) {
-    var api = this
-    var $shoppingBagItemsContainer = elements.shoppingBagItemsContainer
+    api = this
+    $shoppingBagItemsContainer = elements.shoppingBagItemsContainer
     if ($shoppingBagItemsContainer) {
 
-      var normalized_order = normalize(order).get([
+      normalized_order = normalize(order).get([
         'id',
         'formatted_subtotal_amount',
         'formatted_discount_amount',
@@ -238,9 +260,9 @@ module.exports = {
 
         $shoppingBagItemsContainer.innerHTML = ''
 
-        for (var i = 0; i < normalized_order.line_items.length; i++) {
+        for (i = 0; i < normalized_order.line_items.length; i++) {
 
-          var line_item = normalized_order.line_items[i]
+          line_item = normalized_order.line_items[i]
 
           if (line_item.item_type == "skus") {
 
@@ -267,7 +289,7 @@ module.exports = {
               $qtySelect = document.createElement('select')
               $qtySelect.dataset.lineItemId = line_item.id
 
-              for (var qty = 1; qty <= 10; qty++) {
+              for (qty = 1; qty <= 10; qty++) {
                   $option = document.createElement("option")
                   $option.value = qty
                   $option.text = qty
@@ -306,21 +328,23 @@ module.exports = {
           }
         }
       }
-
     }
   },
   getOrder: function() {
 
-    var api = this
+    api = this
 
     return axios
       .get('/api/orders?include=line_items&filter[token]=' + utils.getOrderToken())
       .then(function(response) {
         if (response.data.data.length > 0) {
           api.updateShoppingBagItems(response.data)
-          ui.hideShoppingBagUnavailableMessage()
-          ui.updateShoppingBagPreview(response.data.data[0])
+          ui.hideShoppingBagUnavailableMessage() // refactor
+          ui.updateShoppingBagSummary(response.data.data[0])
           ui.updateShoppingBagCheckout(response.data)
+          if (response.data.data[0].attributes.skus_count == 0) {
+            ui.clearShoppingBag()
+          }
           return response.data.data[0]
         }
       })

@@ -1,11 +1,12 @@
 {
   "name": "commercelayer",
-  "version": "1.1.7",
+  "version": "1.2.1",
   "description": "The Official Commerce Layer JS library",
   "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack --progress --mode=production",
+    "watch": "webpack --progress --watch"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
     "axios": "^0.18.0",
+    "js-cookie": "^2.2.0",
     "json-api-normalize": "^1.1.5"
   },
   "devDependencies": {

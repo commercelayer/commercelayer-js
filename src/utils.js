@@ -1,41 +1,57 @@
 const config = require('./config')
+const cookies = require('js-cookie')
 
 module.exports = {
-  setCookie: function(cname, cvalue, exsecs) {
-      var d = new Date()
-      d.setTime(d.getTime() + (exsecs*1000))
-      var expires = "expires="+ d.toUTCString()
-      document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/"
-  },
-  getCookie: function(cname) {
-      var name = cname + "=";
-      var decodedCookie = decodeURIComponent(document.cookie)
-      var ca = decodedCookie.split(';')
-      for(var i = 0; i <ca.length; i++) {
-          var c = ca[i];
-          while (c.charAt(0) == ' ') {
-              c = c.substring(1);
-          }
-          if (c.indexOf(name) == 0) {
-              return c.substring(name.length, c.length);
-          }
-      }
-      return ""
-  },
-  deleteCookie: function(cname) {
-    document.cookie = cname + "=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/";
-  },
   getOrderCookieName: function() {
-    return 'order_token_' + config.countryCode()
+    return `order_token_${config.countryCode()}`
+  },
+  getAccessTokenCookieName: function() {
+    return `access_token_${config.clientId()}_${config.marketId()}`
+  },
+  getAccessTokenRetryLockCookieName: function() {
+    return `${this.getAccessTokenCookieName()}_retry_lock`
   },
   getOrderToken: function() {
-    return this.getCookie(this.getOrderCookieName())
+    return cookies.get(this.getOrderCookieName())
   },
   setOrderToken: function(token) {
-    return this.setCookie(this.getOrderCookieName(), token, 30*60*60*24)
+    return cookies.set(this.getOrderCookieName(), token, { expires: 30 })
   },
   deleteOrderToken: function() {
-    return this.deleteCookie(this.getOrderCookieName())
-  }
+    return cookies.remove(this.getOrderCookieName())
+  },
+  getAccessTokenCookie: function() {
+    return cookies.get(this.getAccessTokenCookieName())
+  },
+  setAccessTokenCookie: function(access_token, expires_in) {
+    cookies.set(this.getAccessTokenCookieName(), access_token, expires_in)
+  },
+  getAccessTokenRetryLockCookie: function() {
+    return cookies.get(this.getAccessTokenRetryLockCookieName())
+  },
+  setAccessTokenRetryLockCookie: function() {
+    cookies.set(this.getAccessTokenRetryLockCookieName(), "1", { expires: 1/1440 }) // 1 minute
+  },
+  getElementFromTemplate: function(template) {
+    if (template.tagName == "TEMPLATE") {
+      return template.content.cloneNode(true)
+    } else {
+      return template.cloneNode(true)
+    }
+  },
+  getInventoryFirstAvailableLevel: function(inventory) {
 
+    first_level = inventory.levels[0]
+
+    if (first_level.quantity == 0) {
+      for(k=1; k < inventory.levels.length; k++) {
+        level = inventory.levels[k]
+        if (level.quantity > 0) {
+          first_level = level
+          break
+        }
+      }
+    }
+    return first_level
+  }
 }

@@ -8,6 +8,9 @@ exports.init = function() {
   listeners.setVariantSelect()
   listeners.setAddToShoppingBag()
   listeners.setShoppingBagToggle()
-  listeners.setShoppingBagClose()
   api.refreshOrder()
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  module.exports.init()
+})

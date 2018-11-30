@@ -1,21 +1,22 @@
 const elements = require('./elements')
+const utils = require('./utils')
 const normalize = require('json-api-normalize')
 
 module.exports = {
   enableElement: function(el) {
     if (el) {
-      el.removeAttribute('disabled')
+      el.classList.remove("disabled")
     }
   },
   disableElement: function(el) {
     if (el) {
-      el.setAttribute("disabled","disabled")
+      el.classList.add("disabled")
     }
   },
-  setElementHTML(selector, html) {
-    var $el = document.querySelector(selector)
-    if ($el) {
-      $el.innerHTML = html
+  setElementHTML(parent, selector, html) {
+    el = parent.querySelector(selector)
+    if (el) {
+      el.innerHTML = html
     }
   },
   displayElement: function(el) {
@@ -29,12 +30,12 @@ module.exports = {
     }
   },
   updatePrices: function(skus) {
-    for (var k = 0; k < skus.length; k++) {
-      var priceAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .amount')
+    for (k = 0; k < skus.length; k++) {
+      priceAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .amount')
       if (priceAmount) {
         priceAmount.innerHTML = skus[k].prices[0].formatted_amount
       }
-      var priceCompareAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .compare-at-amount')
+      priceCompareAmount = document.querySelector('[data-sku-code="' + skus[k].code + '"] > .compare-at-amount')
       if (priceCompareAmount) {
         if (skus[k].prices[0].compare_at_amount_cents > skus[k].prices[0].amount_cents) {
           priceCompareAmount.innerHTML = skus[k].prices[0].formatted_compare_at_amount
@@ -42,77 +43,129 @@ module.exports = {
       }
     }
   },
-  updateAddToBag: function(skuId, skuName) {
-
-    var $addToBag = elements.addToBag
-
+  updateAddToBagSKU: function(skuId, skuName) {
+    $addToBag = elements.addToBag
     if ($addToBag) {
       $addToBag.dataset.skuId = skuId
       $addToBag.dataset.skuName = skuName
+    }
+  },
+  enableAddToBag: function() {
+    $addToBag = elements.addToBag
+    if ($addToBag) {
       this.enableElement($addToBag)
     }
   },
-  updateAvailableMessage: function(inventory) {
-    var $availableMessage = elements.availableMessage
-    var $unavailableMessage = elements.unavailableMessage
-
-    this.hideElement($unavailableMessage)
-
-    if ($availableMessage) {
-
-      first_level = inventory.levels[0]
-
-      if (first_level.quantity == 0) {
-        for(var k=1; k < inventory.levels.length; k++) {
-          level = inventory.levels[k]
-          if (level.quantity > 0) {
-            first_level = level
-            break
-          }
-        }
-      }
-
-      if (first_level.quantity > 0) {
-        first_delivery_lead_time = first_level.delivery_lead_times[0]
-        this.setElementHTML('.available-message-qty', first_level.quantity)
-        this.setElementHTML('.available-message-min-days', first_delivery_lead_time.min.days)
-        this.setElementHTML('.available-message-max-days', first_delivery_lead_time.max.days)
-        this.setElementHTML('.available-message-shipping-price', first_delivery_lead_time.shipping_method.formatted_price_amount)
-        this.displayElement($availableMessage)
-      }
-
+  disableAddToBag: function() {
+    $addToBag = elements.addToBag
+    if ($addToBag) {
+      this.disableElement($addToBag)
     }
   },
-  updateShoppingBagPreview: function(order) {
-    var $shoppingBagPreviewCount = elements.shoppingBagPreviewCount
-    if ($shoppingBagPreviewCount) {
-      $shoppingBagPreviewCount.innerHTML = order.attributes.skus_count
+  updateAvailabilityMessage: function(inventory) {
+
+    $container = elements.availabilityMessageContainer
+
+    if ($container) {
+
+      first_level = utils.getInventoryFirstAvailableLevel(inventory)
+
+      if (first_level.quantity > 0) {
+
+        dlt = first_level.delivery_lead_times[0]
+
+        qty = first_level.quantity
+        minDays = dlt.min.days
+        maxDays = dlt.max.days
+        shippingMethodName = dlt.shipping_method.name
+        shippingMethodPrice = dlt.shipping_method.formatted_price_amount
+        this.displayAvailableMessage(qty, minDays, maxDays, shippingMethodName, shippingMethodPrice)
+      } else {
+        this.displayUnavailableMessage()
+      }
     }
-    var $shoppingBagPreviewTotal = elements.shoppingBagPreviewTotal
-    if ($shoppingBagPreviewTotal) {
-      $shoppingBagPreviewTotal.innerHTML = order.attributes.formatted_total_amount_with_taxes
+  },
+  updateShoppingBagSummary: function(order) {
+    $shoppingBagItemsCount = elements.shoppingBagItemsCount
+    if ($shoppingBagItemsCount) {
+      $shoppingBagItemsCount.innerHTML = order.attributes.skus_count
+    }
+    $shoppingBagTotal = elements.shoppingBagTotal
+    if ($shoppingBagTotal) {
+      $shoppingBagTotal.innerHTML = order.attributes.formatted_total_amount_with_taxes
+    }
+    $shoppingBagSubtotal = elements.shoppingBagSubtotal
+    if ($shoppingBagSubtotal) {
+      $shoppingBagSubtotal.innerHTML = order.attributes.formatted_subtotal_amount
+    }
+    $shoppingBagShipping = elements.shoppingBagShipping
+    if ($shoppingBagShipping) {
+      $shoppingBagShipping.innerHTML = order.attributes.formatted_shipping_amount
+    }
+    $shoppingBagPayment = elements.shoppingBagPayment
+    if ($shoppingBagPayment) {
+      $shoppingBagPayment.innerHTML = order.attributes.formatted_payment_method_amount
+    }
+    $shoppingBagTaxes = elements.shoppingBagTaxes
+    if ($shoppingBagTaxes) {
+      $shoppingBagTaxes.innerHTML = order.attributes.formatted_total_tax_amount
+    }
+    $shoppingBagDiscount = elements.shoppingBagDiscount
+    if ($shoppingBagDiscount) {
+      $shoppingBagDiscount.innerHTML = order.attributes.formatted_discount_amount
     }
   },
   updateShoppingBagCheckout: function(order) {
-    var $shoppingBagCheckout = elements.shoppingBagCheckout
+    $shoppingBagCheckout = elements.shoppingBagCheckout
     if ($shoppingBagCheckout) {
-      var normalized_order = normalize(order).get([
+      normalized_order = normalize(order).get([
         'line_items.id',
         'checkout_url'
       ])[0]
 
       if (normalized_order.line_items) {
-        $shoppingBagCheckout.removeAttribute('disabled')
+        this.enableElement($shoppingBagCheckout)
         $shoppingBagCheckout.href = normalized_order.checkout_url
       } else {
-        $shoppingBagCheckout.setAttribute('disabled', '')
+        $shoppingBagCheckout.href = ''
+        this.disableElement($shoppingBagCheckout)
       }
     }
   },
+  displayAvailableMessage: function(qty, minDays, maxDays, shippingMethodName, shippingMethodPrice) {
+    $container = elements.availabilityMessageContainer
 
+    if ($container) {
+      $tmp = elements.availabilityMessageAvailableTemplate
+
+      if ($tmp) {
+
+        $el = utils.getElementFromTemplate($tmp)
+
+        this.setElementHTML($el, '.clayer-availability-message-available-qty', qty)
+        this.setElementHTML($el, '.clayer-availability-message-available-min-days', minDays)
+        this.setElementHTML($el, '.clayer-availability-message-available-max-days', maxDays)
+        this.setElementHTML($el, '.clayer-availability-message-available-shipping-method-name', shippingMethodName)
+        this.setElementHTML($el, '.clayer-availability-message-available-shipping-method-price', shippingMethodPrice)
+
+        $container.innerHTML = ''
+        $container.appendChild($el)
+      }
+    }
+  },
   displayUnavailableMessage: function() {
-    this.hideElement(elements.availableMessage)
-    this.displayElement(elements.unavailableMessage)
+
+    $container = elements.availabilityMessageContainer
+
+    if ($container) {
+      $tmp = elements.availabilityMessageUnavailableTemplate
+
+      if ($tmp) {
+        $el = utils.getElementFromTemplate($tmp)
+        $container.innerHTML = ''
+        $container.appendChild($el)
+      }
+    }
   },
   toggleShoppingBag: function() {
     $shoppingBagContainer = elements.shoppingBagContainer
@@ -131,20 +184,11 @@ module.exports = {
     }
     $main = elements.main
     if ($main) {
-      $main.classList.add("open")
-    }
-  },
-  closeShoppingBag: function() {
-    $shoppingBagContainer = elements.shoppingBagContainer
-    if ($shoppingBagContainer) {
-      $shoppingBagContainer.classList.remove("open")
-    }
-    $main = elements.main
-    if ($main) {
       $main.classList.remove("open")
     }
   },
   clearShoppingBag: function() {
+    console.log(elements.shoppingBagItemsContainer);
     elements.shoppingBagItemsContainer.innerHTML = '';
   },
   displayShoppingBagUnavailableMessage: function() {
@@ -152,29 +196,5 @@ module.exports = {
   },
   hideShoppingBagUnavailableMessage: function() {
     this.hideElement(elements.shoppingBagUnavailableMessage)
-  },
-  addTableColText: function(tableRow, text, className) {
-    var tableCol = document.createElement('td')
-    tableCol.classList.add('shopping-bag-col')
-    tableCol.classList.add(className)
-    var tableColText = document.createTextNode(text)
-    tableCol.appendChild(tableColText)
-    tableRow.appendChild(tableCol)
-  },
-  addTableColImage: function(tableRow, imageUrl, className) {
-    var tableCol = document.createElement('td')
-    tableCol.classList.add('shopping-bag-col')
-    tableCol.classList.add(className)
-    var tableColImg = document.createElement('img')
-    tableColImg.src = imageUrl
-    tableCol.appendChild(tableColImg)
-    tableRow.appendChild(tableCol)
-  },
-  addTableColElement: function(tableRow, element, className) {
-    var tableCol = document.createElement('td')
-    tableCol.classList.add('shopping-bag-col')
-    tableCol.classList.add(className)
-    tableCol.appendChild(element)
-    tableRow.appendChild(tableCol)
   }
 }
