@@ -15,6 +15,7 @@ module.exports = {
   shoppingBagSubtotal: document.querySelector('#clayer-shopping-bag-subtotal'),
   shoppingBagShipping: document.querySelector('#clayer-shopping-bag-shipping'),
   shoppingBagPayment: document.querySelector('#clayer-shopping-bag-payment'),
+  shoppingBagDiscount: document.querySelector('#clayer-shopping-bag-discount'),
   shoppingBagTaxes: document.querySelector('#clayer-shopping-bag-taxes'),
   shoppingBagTotal: document.querySelector('#clayer-shopping-bag-total'),
   shoppingBagCheckout: document.querySelector('#clayer-shopping-bag-checkout'),

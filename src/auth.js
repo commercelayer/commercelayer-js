@@ -1,3 +1,4 @@
+const modernizr = require("modernizr")
 const axios = require('axios')
 const config = require('./config')
 const utils = require('./utils')
@@ -31,12 +32,14 @@ axios.interceptors.response.use(function (response) {
   return response
 }, function (error) {
   if (error.response.status === 401) {
-    if (utils.getAccessTokenRetryLockCookie() == undefined) {
-      utils.setAccessTokenRetryLockCookie()
-      return getAccessToken().then(function(accessToken) {
-        error.config.headers.Authorization = 'Bearer ' + accessToken
-        return axios.request(error.config)
-      })
+    if (modernizr.cookies) {
+      if (utils.getAccessTokenRetryLockCookie() == undefined) {
+        utils.setAccessTokenRetryLockCookie()
+        return getAccessToken().then(function(accessToken) {
+          error.config.headers.Authorization = 'Bearer ' + accessToken
+          return axios.request(error.config)
+        })
+      }
     }
   }
   return Promise.reject(error)
