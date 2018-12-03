@@ -188,8 +188,9 @@ module.exports = {
     }
   },
   clearShoppingBag: function() {
-    console.log(elements.shoppingBagItemsContainer);
-    elements.shoppingBagItemsContainer.innerHTML = '';
+    if(elements.shoppingBagItemsContainer){
+      elements.shoppingBagItemsContainer.innerHTML = '';
+    }
   },
   displayShoppingBagUnavailableMessage: function() {
     this.displayElement(elements.shoppingBagUnavailableMessage)

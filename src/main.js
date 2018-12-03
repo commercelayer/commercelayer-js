@@ -12,5 +12,6 @@ exports.init = function() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  window.commercelayer = module.exports
   module.exports.init()
 })
