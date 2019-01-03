@@ -1,6 +1,6 @@
 {
   "name": "commercelayer",
-  "version": "1.2.4",
+  "version": "1.2.9",
   "description": "The Official Commerce Layer JS library",
   "main": "./src/main.js",
   "scripts": {
@@ -32,7 +32,6 @@
   },
   "devDependencies": {
     "webpack": "^4.26.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-modernizr-loader": "^4.0.1"
+    "webpack-cli": "^3.1.2"
   }
 }
