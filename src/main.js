@@ -1,4 +1,4 @@
-function commercelayer() {
+function initCommercelayer() {
   const api = require('./api')
   const listeners = require('./listeners')
   const utils = require('./utils')
@@ -12,16 +12,16 @@ function commercelayer() {
     api.refreshOrder()
   }
 
-  document.commercelayer = module.exports
-  document.commercelayer.init()
+  window.commercelayer = module.exports
+  module.exports.init()
 }
 
 if (document.readyState == 'loading') {
   document.addEventListener('readystatechange', function(event) {
     if (document.readyState == 'interactive') {
-      commercelayer()
+      initCommercelayer()
     }
   })
-} else {
-  commercelayer()
+} else { // interactive or complete
+  initCommercelayer()
 }
