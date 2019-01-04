@@ -23,7 +23,5 @@ if (document.readyState == 'loading') {
     }
   })
 } else {
-  document.addEventListener('DOMContentLoaded', function(event) {
-    commercelayer()
-  })
+  commercelayer()
 }
