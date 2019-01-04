@@ -269,12 +269,7 @@ module.exports = {
             $shoppingBagItemTemplate = elements.shoppingBagItemTemplate
 
             if ($shoppingBagItemTemplate) {
-
-              if ($shoppingBagItemTemplate.tagName == "TEMPLATE") {
-                $shoppingBagItem = $shoppingBagItemTemplate.content.cloneNode(true)
-              } else {
-                $shoppingBagItem = $shoppingBagItemTemplate.cloneNode(true)
-              }
+              $shoppingBagItem = utils.getElementFromTemplate($shoppingBagItemTemplate)
 
               // image
               $shoppingBagItemImage = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-image')

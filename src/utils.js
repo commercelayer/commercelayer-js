@@ -34,9 +34,9 @@ module.exports = {
   },
   getElementFromTemplate: function(template) {
     if (template.tagName == "TEMPLATE") {
-      return template.content.cloneNode(true)
+      return document.importNode(template.content.firstElementChild, true)
     } else {
-      return template.cloneNode(true)
+      return document.importNode(template.firstElementChild, true)
     }
   },
   getInventoryFirstAvailableLevel: function(inventory) {
