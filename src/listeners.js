@@ -1,11 +1,10 @@
 const elements = require('./elements')
-const axios = require('axios')
-const auth = require('./auth')
 const ui = require('./ui')
 const api = require('./api')
 const utils = require('./utils')
 
 module.exports = {
+
   setVariantSelect: function() {
 
     $variantSelect = elements.variantSelect
@@ -24,17 +23,18 @@ module.exports = {
       })
     }
   },
+
   setAddToShoppingBag: function() {
     $addToBag = elements.addToBag
 
     if ($addToBag) {
-      $addToBag.addEventListener('click', function(event){
+      $addToBag.addEventListener('click', function(event) {
         event.preventDefault()
 
         orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
 
         orderPromise.then(function(order){
-          api.createLineItem(order.id, $addToBag.dataset.skuId, $addToBag.dataset.skuName, $addToBag.dataset.skuImageUrl).then(function(lineItem){
+          api.createLineItem(order.get('id')[0], $addToBag.dataset.skuId, $addToBag.dataset.skuName, $addToBag.dataset.skuImageUrl).then(function(lineItem){
             api.getOrder()
             ui.openShoppingBag()
           })
@@ -51,6 +51,7 @@ module.exports = {
       })
     }
   },
+
   setShoppingBagToggle: function() {
     $shoppingBagToggle = elements.shoppingBagToggle
     if ($shoppingBagToggle) {
@@ -60,4 +61,5 @@ module.exports = {
       })
     }
   }
+  
 }

@@ -1,4 +1,5 @@
 module.exports = {
+  
   config: document.querySelector('#clayer-config'),
   main: document.querySelector('#clayer-main'),
   prices: Array.prototype.slice.call(document.querySelectorAll('.clayer-price'), 0),

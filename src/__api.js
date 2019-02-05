@@ -1,4 +1,7 @@
 const elements = require('./elements')
+// const axios = require('axios')
+// const auth = require('./auth')
+// const normalize = require('json-api-normalize')
 const config = require('./config')
 const utils = require('./utils')
 const ui = require('./ui')
@@ -6,25 +9,21 @@ const ui = require('./ui')
 const clsdk = require('@commercelayer/commercelayer-js-sdk')
 
 module.exports = {
-
   getPrices: function() {
 
     $prices = elements.prices
 
     if ($prices.length > 0) {
 
-      let skuCodes = []
+      skuCodes = []
 
       $prices.forEach(function ($price) {
         skuCodes.push($price.dataset.skuCode)
       })
 
-      let qf = new clsdk.query.QueryFilter()
-        .filter('codes', skuCodes.join(','))
-        .include('prices')
-        .page(null, 25);
-
-      let skuAttributes = [
+      skus = []
+      skusEndpoint = '/api/skus?filter[codes]=' + skuCodes.join(',') +'&include=prices&page[size]=25'
+      skuAttributes = [
         'id',
         'code',
         'prices.formatted_amount',
@@ -33,27 +32,29 @@ module.exports = {
         'prices.compare_at_amount_cents'
       ]
 
-      clsdk.listSkus(qf.build())
-        .then(data => {
+      axios
+        .get(skusEndpoint)
+        .then(function(response) {
 
-          ui.updatePrices(data.get(skuAttributes))
+          ui.updatePrices(normalize(response.data).get(skuAttributes))
 
-          let pageCount = data.dataset.meta.page_count;
+          pageCount = response.data.meta.page_count
 
           if (pageCount > 1) {
-            for (p=2; p<=pageCount; p++) {
-              qf.pageNumber(p);
-              clsdk.listSkus(qf)
-                .then(data => ui.updatePrices(data.get(skuAttributes)));
+            for (p=2; p<=pageCount; p++ ) {
+
+              skusEndpointWithPage = skusEndpoint + '&page[number]=' + p
+
+              axios
+                .get(skusEndpointWithPage)
+                .then(function(response) {
+                  ui.updatePrices(normalize(response.data).get(skuAttributes))
+                })
             }
           }
-
-        }
-      );
-        
+        })
     }
   },
-
   getVariants: function() {
 
     ui.disableElement(elements.addToBag)
@@ -62,19 +63,20 @@ module.exports = {
 
     if ($variants.length > 0) {
 
-      let skuCodes = []
+      skuCodes = []
 
       $variants.forEach(function (variant) {
         ui.disableElement(variant)
         skuCodes.push(variant.dataset.skuCode)
       })
 
-      let qf = new clsdk.query.QueryFilter().filter('codes', skuCodes.join(','));
-
-      clsdk.listSkus(qf.build())
-        .then(data => {
-          
-          let skus = data.get(['id', 'code' ]);
+      axios
+        .get('/api/skus?filter[codes]=' + skuCodes.join(','))
+        .then(function(response) {
+          skus = normalize(response.data).get([
+            'id',
+            'code'
+          ])
 
           for (i = 0; i < skus.length; i++) {
 
@@ -87,19 +89,16 @@ module.exports = {
               }
             }
           }
-        
-        }
-      );
-
+        })
     }
   },
-
   getInventory: function(skuId, skuName) {
-    clsdk.retrieveSku(skuId, {'fields[skus]' : 'inventory'})
-      .then((data) => {
-        let inventory = data.get('inventory');
-        ui.updateAvailabilityMessage(inventory)
-        if (inventory.available) {
+    axios
+      .get('/api/skus/' + skuId + '?fields[skus]=inventory')
+      .then(function(response) {
+        sku = response.data.data
+        ui.updateAvailabilityMessage(sku.attributes.inventory)
+        if (sku.attributes.inventory.available) {
           ui.updateAddToBagSKU(skuId, skuName)
           ui.enableAddToBag()
         } else {
@@ -107,7 +106,6 @@ module.exports = {
         }
       })
   },
-
   selectVariant: function(variant) {
     switch(variant.tagName) {
       case "INPUT":
@@ -127,103 +125,123 @@ module.exports = {
         break
     }
   },
-
   createOrder: function() {
-    clsdk.createOrder({
-        type: 'orders',
-        shipping_country_code_lock: config.countryCode(),
-        language_code: config.languageCode(),
-        cart_url: config.cartUrl(),
-        return_url: config.returnUrl(),
-        privacy_url: config.privacyUrl(),
-        terms_url: config.termsUrl()
+    return axios
+      .post('/api/orders', {
+        data: {
+          type: 'orders',
+          attributes: {
+            shipping_country_code_lock: config.countryCode(),
+            language_code: config.languageCode(),
+            cart_url: config.cartUrl(),
+            return_url: config.returnUrl(),
+            privacy_url: config.privacyUrl(),
+            terms_url: config.termsUrl()
+          }
+        }
+      },{
+        headers: {
+          'Content-Type': 'application/vnd.api+json'
+        }
       }
-    ).then(data => {
-      utils.setOrderToken(data.get('token'))
-      return(data)
+    ).then(function(response) {
+      utils.setOrderToken(response.data.data.attributes.token)
+      return(response.data.data)
     })
   },
-
   refreshOrder: function() {
     if (utils.getOrderToken()) {
       this.getOrder().then(function(order) {
-        if (order && order.get('status') == 'placed') {
+        if (order && order.attributes.status == 'placed') {
           utils.deleteOrderToken()
           ui.clearShoppingBag()
         }
       })
     }
   },
-
   createLineItem: function(orderId, skuId, skuName, skuImageUrl) {
-
-    return clsdk.createLineItem({
-      data: {
-        type: 'line_items',
-        attributes: {
-          quantity: 1,
-          name: skuName,
-          image_url: skuImageUrl,
-          _update_quantity: 1
-        },
-        relationships: {
-          order: {
-            data: {
-              type: 'orders',
-              id: orderId
-            }
+    return axios
+      .post('/api/line_items', {
+        data: {
+          type: 'line_items',
+          attributes: {
+            quantity: 1,
+            name: skuName,
+            image_url: skuImageUrl,
+            _update_quantity: 1
           },
-          item: {
-            data: {
-              type: 'skus',
-              id: skuId
+          relationships: {
+            order: {
+              data: {
+                type: 'orders',
+                id: orderId
+              }
+            },
+            item: {
+              data: {
+                type: 'skus',
+                id: skuId
+              }
             }
           }
         }
+      },{
+        headers: {
+          'Content-Type': 'application/vnd.api+json'
+        }
       }
+    )
+    .then(function(response) {
+      return(response.data)
     })
   },
-
   deleteLineItem: function(lineItemId) {
-    return clsdk.deleteLineItem(lineItemId)
-      .then(function() {
+    return axios
+      .delete('/api/line_items/' + lineItemId)
+      .then(function(response) {
         return true
       })
   },
-
   updateLineItem: function(lineItemId, attributes) {
-    return clsdk.updateLineItem(lineItemId, {
-      data: {
-        type: 'line_items',
-        id: lineItemId,
-        attributes: attributes
+    return axios
+      .patch('/api/line_items/' + lineItemId, {
+        data: {
+          type: 'line_items',
+          id: lineItemId,
+          attributes: attributes
+        }
+      },{
+        headers: {
+          'Content-Type': 'application/vnd.api+json'
+        }
       }
+    )
+    .then(function(response) {
+      return(response.data)
     })
   },
-
   updateLineItemQty: function(lineItemId, quantity) {
     api = this
-    api.updateLineItem(lineItemId, { quantity: quantity })
-      .then(function(){
-        api.getOrder()
-      })
-      .catch(function(error) {
-        if (error) {
-          switch(error.status) {
-            case 422:
-              ui.displayShoppingBagUnavailableMessage()
-              break
-          }
+    api.updateLineItem(lineItemId, { quantity: quantity }).then(function(lineItem){
+      api.getOrder()
+    })
+    .catch(function(error) {
+      if (error.response) {
+        switch(error.response.status) {
+          case 422:
+            ui.displayShoppingBagUnavailableMessage()
+            break
         }
-      })
-  },
+      }
+    })
 
+  },
   updateShoppingBagItems: function(order) {
     api = this
     $shoppingBagItemsContainer = elements.shoppingBagItemsContainer
     if ($shoppingBagItemsContainer) {
 
-      normalized_order = order.get([
+      normalized_order = normalize(order).get([
         'id',
         'formatted_subtotal_amount',
         'formatted_discount_amount',
@@ -309,31 +327,24 @@ module.exports = {
       }
     }
   },
-
   getOrder: function() {
 
     api = this
 
-    let qf = new clsdk.query.QueryFilter();
-
-    qf.include('line_items').filter('token', utils.getOrderToken())
-
-    return clsdk.listOrders(qf)
+    return axios
+      .get('/api/orders?include=line_items&filter[token]=' + utils.getOrderToken())
       .then(function(response) {
-        
-        if (response.get(['line_items']).length > 0) {
-          api.updateShoppingBagItems(response)
+        if (response.data.data.length > 0) {
+          api.updateShoppingBagItems(response.data)
           ui.hideShoppingBagUnavailableMessage() // refactor
-          ui.updateShoppingBagSummary(response.dataset.data[0])
-          ui.updateShoppingBagCheckout(response)
-          if (response.get('skus_count') == 0) {
+          ui.updateShoppingBagSummary(response.data.data[0])
+          ui.updateShoppingBagCheckout(response.data)
+          if (response.data.data[0].attributes.skus_count == 0) {
             ui.clearShoppingBag()
           }
-          return response;
+          return response.data.data[0]
         }
-      }
-    )
-
+      })
   }
 
 }

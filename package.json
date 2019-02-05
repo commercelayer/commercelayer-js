@@ -5,7 +5,7 @@
   "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --progress --mode=production",
+    "build": "webpack --progress",
     "watch": "webpack --progress --watch"
   },
   "repository": {
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
+    "@commercelayer/commercelayer-js-sdk": "^1.1.4",
     "axios": "^0.18.0",
     "js-cookie": "^2.2.0",
     "json-api-normalize": "^1.1.5",

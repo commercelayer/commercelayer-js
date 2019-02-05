@@ -85,6 +85,7 @@ module.exports = {
       }
     }
   },
+  
   updateShoppingBagSummary: function(order) {
     $shoppingBagItemsCount = elements.shoppingBagItemsCount
     if ($shoppingBagItemsCount) {
@@ -115,10 +116,11 @@ module.exports = {
       $shoppingBagDiscount.innerHTML = order.attributes.formatted_discount_amount
     }
   },
+  
   updateShoppingBagCheckout: function(order) {
     $shoppingBagCheckout = elements.shoppingBagCheckout
     if ($shoppingBagCheckout) {
-      normalized_order = normalize(order).get([
+      normalized_order = /*normalize(order)*/order.get([
         'line_items.id',
         'checkout_url'
       ])[0]

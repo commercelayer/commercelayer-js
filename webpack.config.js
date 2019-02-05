@@ -1,6 +1,15 @@
 const path = require('path')
 
-module.exports = {
+var devConfig = {
+  mode: 'development',
+  entry: './src/main.js',
+  output: {
+    filename: 'commercelayer.dev.js',
+    path: path.resolve(__dirname, "dist")
+  }
+}
+
+var prodConfig =  {
   mode: 'production',
   entry: './src/main.js',
   output: {
@@ -8,3 +17,8 @@ module.exports = {
     path: path.resolve(__dirname, "dist")
   }
 }
+
+module.exports = [
+  devConfig,
+  prodConfig
+]
