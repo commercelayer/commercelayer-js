@@ -1,4 +1,4 @@
-const clsdk = require('@commercelayer/commercelayer-js-sdk')
+const clsdk = require('@commercelayer/sdk')
 const util = require('util')
 
 

@@ -25,10 +25,8 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
-    "@commercelayer/commercelayer-js-sdk": "^1.1.4",
-    "axios": "^0.18.0",
+    "@commercelayer/sdk": "^1.3.1",
     "js-cookie": "^2.2.0",
-    "json-api-normalize": "^1.1.5",
     "lodash": "^4.17.11"
   },
   "devDependencies": {
