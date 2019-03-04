@@ -1,6 +1,6 @@
 {
   "name": "commercelayer",
-  "version": "1.5.6",
+  "version": "1.6.1",
   "description": "The Official Commerce Layer JS library",
   "main": "./src/main.js",
   "scripts": {

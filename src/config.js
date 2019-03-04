@@ -1,31 +1,29 @@
-const elements = require('./elements')
-
 module.exports = {
   baseUrl: function() {
-    return elements.config.dataset.baseUrl
+    return document.querySelector('#clayer-config').dataset.baseUrl
   },
   clientId: function() {
-    return elements.config.dataset.clientId
+    return document.querySelector('#clayer-config').dataset.clientId
   },
   marketId: function() {
-    return elements.config.dataset.marketId
+    return document.querySelector('#clayer-config').dataset.marketId
   },
   countryCode: function() {
-    return elements.config.dataset.countryCode
+    return document.querySelector('#clayer-config').dataset.countryCode
   },
   languageCode: function() {
-    return elements.config.dataset.languageCode.split("-")[0]
+    return document.querySelector('#clayer-config').dataset.languageCode.split("-")[0]
   },
   cartUrl: function() {
-    return elements.config.dataset.cartUrl
+    return document.querySelector('#clayer-config').dataset.cartUrl
   },
   returnUrl: function() {
-    return elements.config.dataset.returnUrl
+    return document.querySelector('#clayer-config').dataset.returnUrl
   },
   privacyUrl: function() {
-    return elements.config.dataset.privacyUrl
+    return document.querySelector('#clayer-config').dataset.privacyUrl
   },
   termsUrl: function() {
-    return elements.config.dataset.termsUrl
+    return document.querySelector('#clayer-config').dataset.termsUrl
   }
 }

@@ -28,7 +28,7 @@ function initCommercelayer() {
 
   }
 
-  // window.commercelayer = module.exports
+  window.commercelayer = module.exports
   module.exports.init()
 }
 

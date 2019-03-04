@@ -1,4 +1,3 @@
-const elements = require('./elements')
 const ui = require('./ui')
 const api = require('./api')
 const utils = require('./utils')
@@ -7,7 +6,7 @@ module.exports = {
 
   setVariantSelect: function() {
 
-    $variantSelect = elements.variantSelect
+    $variantSelect = document.querySelector('.clayer-variant-select')
 
     if ($variantSelect) {
       $variantSelect.addEventListener('change', function(event){
@@ -15,7 +14,7 @@ module.exports = {
         api.getInventory($selectedOption.value, $selectedOption.dataset.skuName)
       })
     } else { // radio
-      $variants = elements.variants
+      $variants = document.querySelectorAll('.clayer-variant')
       $variants.forEach(function (variant) {
         variant.addEventListener('click', function(event){
           api.getInventory(this.value, this.dataset.skuName)
@@ -25,7 +24,7 @@ module.exports = {
   },
 
   setAddToShoppingBag: function() {
-    $addToBag = elements.addToBag
+    $addToBag = document.querySelector(".clayer-add-to-bag")
 
     if ($addToBag) {
       $addToBag.addEventListener('click', function(event) {
@@ -53,7 +52,7 @@ module.exports = {
   },
 
   setShoppingBagToggle: function() {
-    $shoppingBagToggle = elements.shoppingBagToggle
+    $shoppingBagToggle = document.querySelector('#clayer-shopping-bag-toggle')
     if ($shoppingBagToggle) {
       $shoppingBagToggle.addEventListener('click', function(event){
         event.preventDefault()
@@ -61,5 +60,5 @@ module.exports = {
       })
     }
   }
-  
+
 }

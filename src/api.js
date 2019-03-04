@@ -1,4 +1,3 @@
-const elements = require('./elements')
 const config = require('./config')
 const utils = require('./utils')
 const ui = require('./ui')
@@ -9,7 +8,7 @@ module.exports = {
 
   getPrices: function() {
 
-    $prices = elements.prices
+    $prices = document.querySelectorAll('.clayer-price')
 
     if ($prices.length > 0) {
 
@@ -50,15 +49,15 @@ module.exports = {
 
         }
       );
-        
+
     }
   },
 
   getVariants: function() {
 
-    ui.disableElement(elements.addToBag)
+    ui.disableElement(document.querySelector(".clayer-add-to-bag"))
 
-    $variants = elements.variants
+    $variants = document.querySelectorAll('.clayer-variant')
 
     if ($variants.length > 0) {
 
@@ -73,7 +72,7 @@ module.exports = {
 
       clsdk.listSkus(qf.build())
         .then(data => {
-          
+
           let skus = data.get(['id', 'code' ]);
 
           for (i = 0; i < skus.length; i++) {
@@ -87,7 +86,7 @@ module.exports = {
               }
             }
           }
-        
+
         }
       );
 
@@ -220,7 +219,7 @@ module.exports = {
 
   updateShoppingBagItems: function(order) {
     api = this
-    $shoppingBagItemsContainer = elements.shoppingBagItemsContainer
+    $shoppingBagItemsContainer = document.querySelector('#clayer-shopping-bag-items-container')
     if ($shoppingBagItemsContainer) {
 
       normalized_order = order.get([
@@ -250,7 +249,7 @@ module.exports = {
 
           if (line_item.item_type == "skus") {
 
-            $shoppingBagItemTemplate = elements.shoppingBagItemTemplate
+            $shoppingBagItemTemplate = document.querySelector('#clayer-shopping-bag-item-template')
 
             if ($shoppingBagItemTemplate) {
               $shoppingBagItem = utils.getElementFromTemplate($shoppingBagItemTemplate)
@@ -320,7 +319,7 @@ module.exports = {
 
     return clsdk.listOrders(qf)
       .then(function(response) {
-        
+
         if (response.get(['line_items']).length > 0) {
           api.updateShoppingBagItems(response)
           ui.hideShoppingBagUnavailableMessage() // refactor
