@@ -6,16 +6,16 @@ module.exports = {
 
   setVariantSelect: function() {
 
-    $variantSelect = document.querySelector('.clayer-variant-select')
+    let variantSelect = document.querySelector('.clayer-variant-select')
 
-    if ($variantSelect) {
-      $variantSelect.addEventListener('change', function(event){
-        $selectedOption = $variantSelect.options[this.selectedIndex]
-        api.getInventory($selectedOption.value, $selectedOption.dataset.skuName)
+    if (variantSelect) {
+      variantSelect.addEventListener('change', function(event){
+        let selectedOption = variantSelect.options[this.selectedIndex]
+        api.getInventory(selectedOption.value, selectedOption.dataset.skuName)
       })
     } else { // radio
-      $variants = document.querySelectorAll('.clayer-variant')
-      $variants.forEach(function (variant) {
+      let variants = document.querySelectorAll('.clayer-variant')
+      variants.forEach(function (variant) {
         variant.addEventListener('click', function(event){
           api.getInventory(this.value, this.dataset.skuName)
         })
@@ -24,16 +24,16 @@ module.exports = {
   },
 
   setAddToShoppingBag: function() {
-    $addToBag = document.querySelector(".clayer-add-to-bag")
+    let addToBag = document.querySelector(".clayer-add-to-bag")
 
-    if ($addToBag) {
-      $addToBag.addEventListener('click', function(event) {
+    if (addToBag) {
+      addToBag.addEventListener('click', function(event) {
         event.preventDefault()
 
         orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
 
         orderPromise.then(function(order){
-          api.createLineItem(order.get('id')[0], $addToBag.dataset.skuId, $addToBag.dataset.skuName, $addToBag.dataset.skuImageUrl).then(function(lineItem){
+          api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuImageUrl).then(function(lineItem){
             api.getOrder()
             ui.openShoppingBag()
           })
@@ -52,9 +52,9 @@ module.exports = {
   },
 
   setShoppingBagToggle: function() {
-    $shoppingBagToggle = document.querySelector('#clayer-shopping-bag-toggle')
-    if ($shoppingBagToggle) {
-      $shoppingBagToggle.addEventListener('click', function(event){
+    let shoppingBagToggle = document.querySelector('#clayer-shopping-bag-toggle')
+    if (shoppingBagToggle) {
+      shoppingBagToggle.addEventListener('click', function(event){
         event.preventDefault()
         ui.toggleShoppingBag()
       })

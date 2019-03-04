@@ -3,7 +3,7 @@ function initCommercelayer() {
   const api = require('./api')
   const listeners = require('./listeners')
   const config = require('./config')
-  const clsdk = require('@commercelayer/commercelayer-js-sdk')
+  const clsdk = require('@commercelayer/sdk')
 
   exports.init = function() {
 

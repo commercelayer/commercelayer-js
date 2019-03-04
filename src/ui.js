@@ -43,29 +43,29 @@ module.exports = {
     }
   },
   updateAddToBagSKU: function(skuId, skuName) {
-    $addToBag = document.querySelector(".clayer-add-to-bag")
-    if ($addToBag) {
-      $addToBag.dataset.skuId = skuId
-      $addToBag.dataset.skuName = skuName
+    let addToBag = document.querySelector(".clayer-add-to-bag")
+    if (addToBag) {
+      addToBag.dataset.skuId = skuId
+      addToBag.dataset.skuName = skuName
     }
   },
   enableAddToBag: function() {
-    $addToBag = document.querySelector(".clayer-add-to-bag")
-    if ($addToBag) {
-      this.enableElement($addToBag)
+    let addToBag = document.querySelector(".clayer-add-to-bag")
+    if (addToBag) {
+      this.enableElement(addToBag)
     }
   },
   disableAddToBag: function() {
-    $addToBag = document.querySelector(".clayer-add-to-bag")
-    if ($addToBag) {
-      this.disableElement($addToBag)
+    let addToBag = document.querySelector(".clayer-add-to-bag")
+    if (addToBag) {
+      this.disableElement(addToBag)
     }
   },
   updateAvailabilityMessage: function(inventory) {
 
-    $container = document.querySelector('#clayer-availability-message-container')
+    let container = document.querySelector('#clayer-availability-message-container')
 
-    if ($container) {
+    if (container) {
 
       first_level = utils.getInventoryFirstAvailableLevel(inventory)
 
@@ -86,106 +86,106 @@ module.exports = {
   },
 
   updateShoppingBagSummary: function(order) {
-    $shoppingBagItemsCount = document.querySelector('#clayer-shopping-bag-items-count')
-    if ($shoppingBagItemsCount) {
-      $shoppingBagItemsCount.innerHTML = order.attributes.skus_count
+    let shoppingBagItemsCount = document.querySelector('#clayer-shopping-bag-items-count')
+    if (shoppingBagItemsCount) {
+      shoppingBagItemsCount.innerHTML = order.attributes.skus_count
     }
-    $shoppingBagTotal = document.querySelector('#clayer-shopping-bag-total')
-    if ($shoppingBagTotal) {
-      $shoppingBagTotal.innerHTML = order.attributes.formatted_total_amount_with_taxes
+    let shoppingBagTotal = document.querySelector('#clayer-shopping-bag-total')
+    if (shoppingBagTotal) {
+      shoppingBagTotal.innerHTML = order.attributes.formatted_total_amount_with_taxes
     }
-    $shoppingBagSubtotal = document.querySelector('#clayer-shopping-bag-subtotal')
-    if ($shoppingBagSubtotal) {
-      $shoppingBagSubtotal.innerHTML = order.attributes.formatted_subtotal_amount
+    let shoppingBagSubtotal = document.querySelector('#clayer-shopping-bag-subtotal')
+    if (shoppingBagSubtotal) {
+      shoppingBagSubtotal.innerHTML = order.attributes.formatted_subtotal_amount
     }
-    $shoppingBagShipping = document.querySelector('#clayer-shopping-bag-shipping')
-    if ($shoppingBagShipping) {
-      $shoppingBagShipping.innerHTML = order.attributes.formatted_shipping_amount
+    let shoppingBagShipping = document.querySelector('#clayer-shopping-bag-shipping')
+    if (shoppingBagShipping) {
+      shoppingBagShipping.innerHTML = order.attributes.formatted_shipping_amount
     }
-    $shoppingBagPayment = document.querySelector('#clayer-shopping-bag-payment')
-    if ($shoppingBagPayment) {
-      $shoppingBagPayment.innerHTML = order.attributes.formatted_payment_method_amount
+    let shoppingBagPayment = document.querySelector('#clayer-shopping-bag-payment')
+    if (shoppingBagPayment) {
+      shoppingBagPayment.innerHTML = order.attributes.formatted_payment_method_amount
     }
-    $shoppingBagTaxes = document.querySelector('#clayer-shopping-bag-taxes')
-    if ($shoppingBagTaxes) {
-      $shoppingBagTaxes.innerHTML = order.attributes.formatted_total_tax_amount
+    let shoppingBagTaxes = document.querySelector('#clayer-shopping-bag-taxes')
+    if (shoppingBagTaxes) {
+      shoppingBagTaxes.innerHTML = order.attributes.formatted_total_tax_amount
     }
-    $shoppingBagDiscount = document.querySelector('#clayer-shopping-bag-discount')
-    if ($shoppingBagDiscount) {
-      $shoppingBagDiscount.innerHTML = order.attributes.formatted_discount_amount
+    let shoppingBagDiscount = document.querySelector('#clayer-shopping-bag-discount')
+    if (shoppingBagDiscount) {
+      shoppingBagDiscount.innerHTML = order.attributes.formatted_discount_amount
     }
   },
 
   updateShoppingBagCheckout: function(order) {
-    $shoppingBagCheckout = document.querySelector('#clayer-shopping-bag-checkout')
-    if ($shoppingBagCheckout) {
+    let shoppingBagCheckout = document.querySelector('#clayer-shopping-bag-checkout')
+    if (shoppingBagCheckout) {
       normalized_order = /*normalize(order)*/order.get([
         'line_items.id',
         'checkout_url'
       ])[0]
 
       if (normalized_order.line_items) {
-        this.enableElement($shoppingBagCheckout)
-        $shoppingBagCheckout.href = normalized_order.checkout_url
+        this.enableElement(shoppingBagCheckout)
+        shoppingBagCheckout.href = normalized_order.checkout_url
       } else {
-        $shoppingBagCheckout.href = ''
-        this.disableElement($shoppingBagCheckout)
+        shoppingBagCheckout.href = ''
+        this.disableElement(shoppingBagCheckout)
       }
     }
   },
   displayAvailableMessage: function(qty, minDays, maxDays, shippingMethodName, shippingMethodPrice) {
-    $container = document.querySelector('#clayer-availability-message-container')
+    let container = document.querySelector('#clayer-availability-message-container')
 
-    if ($container) {
-      $tmp = document.querySelector('#clayer-availability-message-available-template')
+    if (container) {
+      let tmp = document.querySelector('#clayer-availability-message-available-template')
 
-      if ($tmp) {
+      if (tmp) {
 
-        $el = utils.getElementFromTemplate($tmp)
+        let el = utils.getElementFromTemplate(tmp)
 
-        this.setElementHTML($el, '.clayer-availability-message-available-qty', qty)
-        this.setElementHTML($el, '.clayer-availability-message-available-min-days', minDays)
-        this.setElementHTML($el, '.clayer-availability-message-available-max-days', maxDays)
-        this.setElementHTML($el, '.clayer-availability-message-available-shipping-method-name', shippingMethodName)
-        this.setElementHTML($el, '.clayer-availability-message-available-shipping-method-price', shippingMethodPrice)
+        this.setElementHTML(el, '.clayer-availability-message-available-qty', qty)
+        this.setElementHTML(el, '.clayer-availability-message-available-min-days', minDays)
+        this.setElementHTML(el, '.clayer-availability-message-available-max-days', maxDays)
+        this.setElementHTML(el, '.clayer-availability-message-available-shipping-method-name', shippingMethodName)
+        this.setElementHTML(el, '.clayer-availability-message-available-shipping-method-price', shippingMethodPrice)
 
-        $container.innerHTML = ''
-        $container.appendChild($el)
+        container.innerHTML = ''
+        container.appendChild(el)
       }
     }
   },
   displayUnavailableMessage: function() {
 
-    $container = document.querySelector('#clayer-availability-message-container')
+    let container = document.querySelector('#clayer-availability-message-container')
 
-    if ($container) {
-      $tmp = document.querySelector('#clayer-availability-message-unavailable-template')
+    if (container) {
+      let tmp = document.querySelector('#clayer-availability-message-unavailable-template')
 
-      if ($tmp) {
-        $el = utils.getElementFromTemplate($tmp)
-        $container.innerHTML = ''
-        $container.appendChild($el)
+      if (tmp) {
+        let el = utils.getElementFromTemplate(tmp)
+        container.innerHTML = ''
+        container.appendChild(el)
       }
     }
   },
   toggleShoppingBag: function() {
-    $shoppingBagContainer = document.querySelector('#clayer-shopping-bag-container')
-    if ($shoppingBagContainer) {
-      $shoppingBagContainer.classList.toggle("open")
+    let shoppingBagContainer = document.querySelector('#clayer-shopping-bag-container')
+    if (shoppingBagContainer) {
+      shoppingBagContainer.classList.toggle("open")
     }
-    $main = document.querySelector('#clayer-main')
-    if ($main) {
-      $main.classList.toggle("open")
+    let main = document.querySelector('#clayer-main')
+    if (main) {
+      main.classList.toggle("open")
     }
   },
   openShoppingBag: function() {
-    $shoppingBagContainer = document.querySelector('#clayer-shopping-bag-container')
-    if ($shoppingBagContainer) {
-      $shoppingBagContainer.classList.add("open")
+    let shoppingBagContainer = document.querySelector('#clayer-shopping-bag-container')
+    if (shoppingBagContainer) {
+      shoppingBagContainer.classList.add("open")
     }
-    $main = document.querySelector('#clayer-main')
-    if ($main) {
-      $main.classList.remove("open")
+    let main = document.querySelector('#clayer-main')
+    if (main) {
+      main.classList.remove("open")
     }
   },
   clearShoppingBag: function() {

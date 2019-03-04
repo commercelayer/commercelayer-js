@@ -1,6 +1,6 @@
 {
   "name": "commercelayer",
-  "version": "1.6.1",
+  "version": "1.6.3",
   "description": "The Official Commerce Layer JS library",
   "main": "./src/main.js",
   "scripts": {
@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
-    "@commercelayer/sdk": "^1.3.1",
+    "@commercelayer/sdk": "^1.4.2",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.11"
   },

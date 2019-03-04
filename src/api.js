@@ -1,21 +1,20 @@
 const config = require('./config')
 const utils = require('./utils')
 const ui = require('./ui')
-
-const clsdk = require('@commercelayer/commercelayer-js-sdk')
+const clsdk = require('@commercelayer/sdk')
 
 module.exports = {
 
   getPrices: function() {
 
-    $prices = document.querySelectorAll('.clayer-price')
+    let prices = document.querySelectorAll('.clayer-price')
 
-    if ($prices.length > 0) {
+    if (prices.length > 0) {
 
       let skuCodes = []
 
-      $prices.forEach(function ($price) {
-        skuCodes.push($price.dataset.skuCode)
+      prices.forEach(function (price) {
+        skuCodes.push(price.dataset.skuCode)
       })
 
       let qf = new clsdk.query.QueryFilter()
@@ -57,13 +56,13 @@ module.exports = {
 
     ui.disableElement(document.querySelector(".clayer-add-to-bag"))
 
-    $variants = document.querySelectorAll('.clayer-variant')
+    let variants = document.querySelectorAll('.clayer-variant')
 
-    if ($variants.length > 0) {
+    if (variants.length > 0) {
 
       let skuCodes = []
 
-      $variants.forEach(function (variant) {
+      variants.forEach(function (variant) {
         ui.disableElement(variant)
         skuCodes.push(variant.dataset.skuCode)
       })
@@ -120,9 +119,9 @@ module.exports = {
         }
         break
       case "OPTION":
-        $select = variant.parentNode
-        $select.value = variant.value
-        $select.dispatchEvent(new Event('change'))
+        let select = variant.parentNode
+        select.value = variant.value
+        select.dispatchEvent(new Event('change'))
         break
     }
   },
@@ -219,8 +218,8 @@ module.exports = {
 
   updateShoppingBagItems: function(order) {
     api = this
-    $shoppingBagItemsContainer = document.querySelector('#clayer-shopping-bag-items-container')
-    if ($shoppingBagItemsContainer) {
+    let shoppingBagItemsContainer = document.querySelector('#clayer-shopping-bag-items-container')
+    if (shoppingBagItemsContainer) {
 
       normalized_order = order.get([
         'id',
@@ -241,7 +240,7 @@ module.exports = {
 
       if (normalized_order.line_items) {
 
-        $shoppingBagItemsContainer.innerHTML = ''
+        shoppingBagItemsContainer.innerHTML = ''
 
         for (i = 0; i < normalized_order.line_items.length; i++) {
 
@@ -249,58 +248,58 @@ module.exports = {
 
           if (line_item.item_type == "skus") {
 
-            $shoppingBagItemTemplate = document.querySelector('#clayer-shopping-bag-item-template')
+            let shoppingBagItemTemplate = document.querySelector('#clayer-shopping-bag-item-template')
 
-            if ($shoppingBagItemTemplate) {
-              $shoppingBagItem = utils.getElementFromTemplate($shoppingBagItemTemplate)
+            if (shoppingBagItemTemplate) {
+              let shoppingBagItem = utils.getElementFromTemplate(shoppingBagItemTemplate)
 
               // image
-              $shoppingBagItemImage = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-image')
-              $shoppingBagItemImage.src = line_item.image_url
+              let shoppingBagItemImage = shoppingBagItem.querySelector('.clayer-shopping-bag-item-image')
+              shoppingBagItemImage.src = line_item.image_url
 
               // name
-              $shoppingBagItemName = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-name')
-              $shoppingBagItemName.innerHTML = line_item.name
+              let shoppingBagItemName = shoppingBagItem.querySelector('.clayer-shopping-bag-item-name')
+              shoppingBagItemName.innerHTML = line_item.name
 
               // qty
-              $shoppingBagItemQtyContainer = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-qty-container')
-              $qtySelect = document.createElement('select')
-              $qtySelect.dataset.lineItemId = line_item.id
+              let shoppingBagItemQtyContainer = shoppingBagItem.querySelector('.clayer-shopping-bag-item-qty-container')
+              let qtySelect = document.createElement('select')
+              qtySelect.dataset.lineItemId = line_item.id
 
               for (qty = 1; qty <= 10; qty++) {
-                  $option = document.createElement("option")
-                  $option.value = qty
-                  $option.text = qty
+                  let option = document.createElement("option")
+                  option.value = qty
+                  option.text = qty
                   if (qty == line_item.quantity) {
-                    $option.selected = true
+                    option.selected = true
                   }
-                  $qtySelect.appendChild($option)
+                  qtySelect.appendChild($option)
               }
 
-              $qtySelect.addEventListener('change', function(event){
+              qtySelect.addEventListener('change', function(event){
                 api.updateLineItemQty(this.dataset.lineItemId, this.value)
               })
-              $shoppingBagItemQtyContainer.appendChild($qtySelect)
+              shoppingBagItemQtyContainer.appendChild($qtySelect)
 
               // unit_amount
-              $shoppingBagItemUnitAmount = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-unit-amount')
-              $shoppingBagItemUnitAmount.innerHTML = line_item.formatted_unit_amount
+              let shoppingBagItemUnitAmount = shoppingBagItem.querySelector('.clayer-shopping-bag-item-unit-amount')
+              shoppingBagItemUnitAmount.innerHTML = line_item.formatted_unit_amount
 
               // total_amount
-              $shoppingBagItemTotalAmount = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-total-amount')
-              $shoppingBagItemTotalAmount.innerHTML = line_item.formatted_total_amount
+              let shoppingBagItemTotalAmount = shoppingBagItem.querySelector('.clayer-shopping-bag-item-total-amount')
+              shoppingBagItemTotalAmount.innerHTML = line_item.formatted_total_amount
 
               // remove
-              $shoppingBagItemRemove = $shoppingBagItem.querySelector('.clayer-shopping-bag-item-remove')
-              $shoppingBagItemRemove.dataset.lineItemId = line_item.id
-              $shoppingBagItemRemove.addEventListener('click', function(event){
+              let shoppingBagItemRemove = shoppingBagItem.querySelector('.clayer-shopping-bag-item-remove')
+              shoppingBagItemRemove.dataset.lineItemId = line_item.id
+              shoppingBagItemRemove.addEventListener('click', function(event){
                 event.preventDefault()
                 api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
                   api.getOrder()
                 })
               })
 
-              $shoppingBagItemsContainer.appendChild($shoppingBagItem)
+              shoppingBagItemsContainer.appendChild($shoppingBagItem)
 
             }
           }
@@ -332,7 +331,5 @@ module.exports = {
         }
       }
     )
-
   }
-
 }
