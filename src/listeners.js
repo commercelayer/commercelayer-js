@@ -33,6 +33,7 @@ module.exports = {
         orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
 
         orderPromise.then(function(order){
+
           api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuImageUrl).then(function(lineItem){
             api.getOrder()
             ui.openShoppingBag()

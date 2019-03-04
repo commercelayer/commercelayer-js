@@ -273,13 +273,15 @@ module.exports = {
                   if (qty == line_item.quantity) {
                     option.selected = true
                   }
-                  qtySelect.appendChild($option)
+                  qtySelect.appendChild(option)
               }
 
               qtySelect.addEventListener('change', function(event){
+                event.preventDefault()
+                event.stopPropagation()
                 api.updateLineItemQty(this.dataset.lineItemId, this.value)
               })
-              shoppingBagItemQtyContainer.appendChild($qtySelect)
+              shoppingBagItemQtyContainer.appendChild(qtySelect)
 
               // unit_amount
               let shoppingBagItemUnitAmount = shoppingBagItem.querySelector('.clayer-shopping-bag-item-unit-amount')
@@ -294,12 +296,13 @@ module.exports = {
               shoppingBagItemRemove.dataset.lineItemId = line_item.id
               shoppingBagItemRemove.addEventListener('click', function(event){
                 event.preventDefault()
+                event.stopPropagation()
                 api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
                   api.getOrder()
                 })
               })
 
-              shoppingBagItemsContainer.appendChild($shoppingBagItem)
+              shoppingBagItemsContainer.appendChild(shoppingBagItem)
 
             }
           }
