@@ -54,8 +54,6 @@ module.exports = {
 
   getVariants: function() {
 
-    ui.disableElement(document.querySelector(".clayer-add-to-bag"))
-
     let variants = document.querySelectorAll('.clayer-variant')
 
     if (variants.length > 0) {
@@ -76,19 +74,25 @@ module.exports = {
 
           for (i = 0; i < skus.length; i++) {
 
-            variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
+            let variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
+
             if (variant) {
               variant.value = skus[i].id
               ui.enableElement(variant)
-              if (i == 0) {
-                module.exports.selectVariant(variant)
+              // if (i == 0) {
+              //   module.exports.selectVariant(variant)
+              // }
+
+              let addToBag = document.querySelector('.clayer-add-to-bag[data-sku-code="' + skus[i].code + '"]')
+
+              if (addToBag) {
+                addToBag.dataset.skuId = skus[i].id
+                addToBag.dataset.skuName = variant.dataset.skuName
               }
             }
           }
-
         }
       );
-
     }
   },
 

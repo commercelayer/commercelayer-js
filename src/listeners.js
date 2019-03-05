@@ -23,29 +23,31 @@ module.exports = {
     }
   },
 
-  setAddToShoppingBag: function() {
-    let addToBag = document.querySelector(".clayer-add-to-bag")
+  setAddToShoppingBagButtons: function() {
+    let addToBagButtons = document.querySelectorAll(".clayer-add-to-bag")
 
-    if (addToBag) {
-      addToBag.addEventListener('click', function(event) {
-        event.preventDefault()
+    if (addToBagButtons.length > 0) {
+      addToBagButtons.forEach(function (addToBag) {
+        addToBag.addEventListener('click', function(event) {
+          event.preventDefault()
 
-        orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
+          orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
 
-        orderPromise.then(function(order){
+          orderPromise.then(function(order){
 
-          api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuImageUrl).then(function(lineItem){
-            api.getOrder()
-            ui.openShoppingBag()
-          })
-          .catch(function(error) {
-            if (error.response) {
-              switch(error.response.status) {
-                case 422:
-                  ui.displayUnavailableMessage()
-                  break
+            api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuImageUrl).then(function(lineItem){
+              api.getOrder()
+              ui.openShoppingBag()
+            })
+            .catch(function(error) {
+              if (error.response) {
+                switch(error.response.status) {
+                  case 422:
+                    ui.displayUnavailableMessage()
+                    break
+                }
               }
-            }
+            })
           })
         })
       })

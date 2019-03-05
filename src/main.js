@@ -22,7 +22,7 @@ function initCommercelayer() {
     api.getPrices()
     api.getVariants()
     listeners.setVariantSelect()
-    listeners.setAddToShoppingBag()
+    listeners.setAddToShoppingBagButtons()
     listeners.setShoppingBagToggle()
     api.refreshOrder()
 
