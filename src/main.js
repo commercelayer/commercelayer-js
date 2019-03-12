@@ -8,24 +8,26 @@ function initCommercelayer() {
   exports.init = function() {
 
     clsdk.initialize({
-      client_id : config.clientId(),
-      market_id : config.marketId(),
-      base_url : config.baseUrl(),
-      country_code : config.countryCode(),
-      language_code : config.languageCode()
-    });
+      client_id : config.clientId,
+      market_id : config.marketId,
+      base_url : config.baseUrl,
+      country_code : config.countryCode,
+      language_code : config.languageCode
+    })
 
-    clsdk.settings.debug = true;
-    clsdk.settings.console = true;
-    clsdk.settings.trace = true;
+    clsdk.settings.debug = config.devSettings.debug
+    clsdk.settings.console = config.devSettings.console
+    clsdk.settings.trace = config.devSettings.trace
 
     api.getPrices()
     api.getVariants()
-    listeners.setVariantSelect()
-    listeners.setAddToShoppingBagButtons()
-    listeners.setShoppingBagToggle()
-    api.refreshOrder()
+    api.getAddToBags()
 
+    listeners.setupVariants()
+    listeners.setupAddToBags()
+    listeners.setupShoppingBagToggles()
+
+    api.refreshOrder()
   }
 
   window.commercelayer = module.exports

@@ -1,29 +1,18 @@
+let clayerConfig = document.querySelector('#clayer-config');
+
 module.exports = {
-  baseUrl: function() {
-    return document.querySelector('#clayer-config').dataset.baseUrl
-  },
-  clientId: function() {
-    return document.querySelector('#clayer-config').dataset.clientId
-  },
-  marketId: function() {
-    return document.querySelector('#clayer-config').dataset.marketId
-  },
-  countryCode: function() {
-    return document.querySelector('#clayer-config').dataset.countryCode
-  },
-  languageCode: function() {
-    return document.querySelector('#clayer-config').dataset.languageCode.split("-")[0]
-  },
-  cartUrl: function() {
-    return document.querySelector('#clayer-config').dataset.cartUrl
-  },
-  returnUrl: function() {
-    return document.querySelector('#clayer-config').dataset.returnUrl
-  },
-  privacyUrl: function() {
-    return document.querySelector('#clayer-config').dataset.privacyUrl
-  },
-  termsUrl: function() {
-    return document.querySelector('#clayer-config').dataset.termsUrl
+  baseUrl: clayerConfig.dataset.baseUrl,
+  clientId: clayerConfig.dataset.clientId,
+  marketId: clayerConfig.dataset.marketId,
+  countryCode: clayerConfig.dataset.countryCode,
+  languageCode: clayerConfig.dataset.languageCode.split("-")[0],
+  cartUrl: clayerConfig.dataset.cartUrl,
+  returnUrl: clayerConfig.dataset.returnUrl,
+  privacyUrl: clayerConfig.dataset.privacyUrl,
+  termsUrl: clayerConfig.dataset.termsUrl,
+  devSettings: {
+    debug: clayerConfig.dataset.devSettingsDebug,
+    console: clayerConfig.dataset.devSettingsConsole,
+    trace: clayerConfig.dataset.devSettingsTrace
   }
 }

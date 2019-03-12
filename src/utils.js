@@ -3,10 +3,10 @@ const cookies = require('js-cookie')
 
 module.exports = {
   getOrderCookieName: function() {
-    return `order_token_${config.clientId()}_${config.marketId()}_${config.countryCode()}`
+    return `order_token_${config.clientId}_${config.marketId}_${config.countryCode}`
   },
   getAccessTokenCookieName: function() {
-    return `access_token_${config.clientId()}_${config.marketId()}`
+    return `access_token_${config.clientId}_${config.marketId}`
   },
   getAccessTokenRetryLockCookieName: function() {
     return `${this.getAccessTokenCookieName()}_retry_lock`

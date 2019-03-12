@@ -4,64 +4,60 @@ const utils = require('./utils')
 
 module.exports = {
 
-  setVariantSelect: function() {
-
-    let variantSelect = document.querySelector('.clayer-variant-select')
-
-    if (variantSelect) {
+  setupVariants: function() {
+    let variantSelects = document.querySelectorAll('.clayer-variant-select')
+    variantSelects.forEach(function (variantSelect) {
       variantSelect.addEventListener('change', function(event){
         let selectedOption = variantSelect.options[this.selectedIndex]
-        api.getInventory(selectedOption.value, selectedOption.dataset.skuName)
+        api.selectSku(selectedOption.value, selectedOption.dataset.skuName, selectedOption.dataset.skuReference, selectedOption.dataset.skuImageUrl, this.dataset.priceContainerId, this.dataset.availabilityMessageContainerId, this.dataset.addToBagId)
       })
-    } else { // radio
-      let variants = document.querySelectorAll('.clayer-variant')
-      variants.forEach(function (variant) {
-        variant.addEventListener('click', function(event){
-          api.getInventory(this.value, this.dataset.skuName)
-        })
+    })
+
+    let variantRadios = document.querySelectorAll('.clayer-variant-radio')
+    variantRadios.forEach(function (variantRadio) {
+      variantRadio.addEventListener('click', function(event){
+        api.selectSku(this.value, this.dataset.skuName, this.dataset.skuReference, this.dataset.skuImageUrl, this.dataset.priceContainerId, this.dataset.availabilityMessageContainerId, this.dataset.addToBagId)
       })
-    }
+    })
   },
 
-  setAddToShoppingBagButtons: function() {
-    let addToBagButtons = document.querySelectorAll(".clayer-add-to-bag")
+  setupAddToBags: function() {
+    let addToBags = document.querySelectorAll(".clayer-add-to-bag")
 
-    if (addToBagButtons.length > 0) {
-      addToBagButtons.forEach(function (addToBag) {
-        addToBag.addEventListener('click', function(event) {
-          event.preventDefault()
+    addToBags.forEach(function (addToBag) {
+      addToBag.addEventListener('click', function(event) {
+        event.preventDefault()
 
-          orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
+        let orderPromise = utils.getOrderToken() ? api.getOrder() : api.createOrder()
 
-          orderPromise.then(function(order){
+        orderPromise.then(function(order){
 
-            api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuImageUrl).then(function(lineItem){
-              api.getOrder()
-              ui.openShoppingBag()
-            })
-            .catch(function(error) {
-              if (error.response) {
-                switch(error.response.status) {
-                  case 422:
-                    ui.displayUnavailableMessage()
-                    break
+          api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuReference, addToBag.dataset.skuImageUrl).then(function(lineItem){
+            api.getOrder()
+            ui.openShoppingBag()
+          })
+          .catch(function(error) {
+            switch(error.status) {
+              case 422:
+                let availabilityMessageContainer = document.querySelector(`#${addToBag.dataset.availabilityMessageContainerId}`)
+                if (availabilityMessageContainer) {
+                  ui.displayUnavailableMessage(availabilityMessageContainer)
                 }
-              }
-            })
+                break
+            }
           })
         })
       })
-    }
+    })
   },
 
-  setShoppingBagToggle: function() {
-    let shoppingBagToggle = document.querySelector('#clayer-shopping-bag-toggle')
-    if (shoppingBagToggle) {
+  setupShoppingBagToggles: function() {
+    let shoppingBagToggles = document.querySelectorAll('.clayer-shopping-bag-toggle')
+    shoppingBagToggles.forEach(function(shoppingBagToggle){
       shoppingBagToggle.addEventListener('click', function(event){
         event.preventDefault()
         ui.toggleShoppingBag()
       })
-    }
+    })
   }
-
 }

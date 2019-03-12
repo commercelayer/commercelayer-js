@@ -20,19 +20,18 @@ module.exports = {
       let qf = new clsdk.query.QueryFilter()
         .filter('codes', skuCodes.join(','))
         .include('prices')
-        .page(null, 25);
-
-      let skuAttributes = [
-        'id',
-        'code',
-        'prices.formatted_amount',
-        'prices.formatted_compare_at_amount',
-        'prices.amount_cents',
-        'prices.compare_at_amount_cents'
-      ]
 
       clsdk.listSkus(qf.build())
         .then(data => {
+
+          let skuAttributes = [
+            'id',
+            'code',
+            'prices.formatted_amount',
+            'prices.formatted_compare_at_amount',
+            'prices.amount_cents',
+            'prices.compare_at_amount_cents'
+          ]
 
           ui.updatePrices(data.get(skuAttributes))
 
@@ -40,15 +39,13 @@ module.exports = {
 
           if (pageCount > 1) {
             for (p=2; p<=pageCount; p++) {
-              qf.pageNumber(p);
+              qf.pageNumber(p)
               clsdk.listSkus(qf)
-                .then(data => ui.updatePrices(data.get(skuAttributes)));
+                .then(data => ui.updatePrices(data.get(skuAttributes)))
             }
           }
-
         }
-      );
-
+      )
     }
   },
 
@@ -61,89 +58,141 @@ module.exports = {
       let skuCodes = []
 
       variants.forEach(function (variant) {
-        ui.disableElement(variant)
         skuCodes.push(variant.dataset.skuCode)
       })
 
-      let qf = new clsdk.query.QueryFilter().filter('codes', skuCodes.join(','));
+      let qf = new clsdk.query.QueryFilter()
+        .filter('codes', skuCodes.join(','))
+
+      let skuAttributes = [
+        'id',
+        'code'
+      ]
 
       clsdk.listSkus(qf.build())
         .then(data => {
 
-          let skus = data.get(['id', 'code' ]);
+          ui.updateVariants(data.get(skuAttributes))
 
-          for (i = 0; i < skus.length; i++) {
+          let pageCount = data.dataset.meta.page_count;
 
-            let variant = document.querySelector('.clayer-variant[data-sku-code="' + skus[i].code + '"]')
-
-            if (variant) {
-              variant.value = skus[i].id
-              ui.enableElement(variant)
-              // if (i == 0) {
-              //   module.exports.selectVariant(variant)
-              // }
-
-              let addToBag = document.querySelector('.clayer-add-to-bag[data-sku-code="' + skus[i].code + '"]')
-
-              if (addToBag) {
-                addToBag.dataset.skuId = skus[i].id
-                addToBag.dataset.skuName = variant.dataset.skuName
-              }
+          if (pageCount > 1) {
+            for (p=2; p<=pageCount; p++) {
+              qf.pageNumber(p)
+              clsdk.listSkus(qf)
+                .then(data => ui.updateVariants(data.get(skuAttributes)))
             }
           }
         }
-      );
+      )
     }
   },
 
-  getInventory: function(skuId, skuName) {
-    clsdk.retrieveSku(skuId, {'fields[skus]' : 'inventory'})
+  getAddToBags: function() {
+
+    let addToBags = document.querySelectorAll('.clayer-add-to-bag')
+
+    if (addToBags.length > 0) {
+
+      let skuCodes = []
+
+      addToBags.forEach(function (addToBag) {
+        skuCodes.push(addToBag.dataset.skuCode)
+      })
+
+      let qf = new clsdk.query.QueryFilter()
+        .filter('codes', skuCodes.join(','))
+
+      let skuAttributes = [
+        'id',
+        'code'
+      ]
+
+      clsdk.listSkus(qf.build())
+        .then(data => {
+
+          ui.updateAddToBags(data.get(skuAttributes))
+
+          let pageCount = data.dataset.meta.page_count;
+
+          if (pageCount > 1) {
+            for (p=2; p<=pageCount; p++) {
+              qf.pageNumber(p)
+              clsdk.listSkus(qf)
+                .then(data => ui.updateAddToBags(data.get(skuAttributes)))
+            }
+          }
+        }
+      )
+    }
+  },
+
+  selectSku: function(skuId, skuName, skuReference, skuImageUrl, priceContainerId, availabilityMessageContainerId, addToBagId) {
+    let qf = new clsdk.query.QueryFilter().include('prices')
+
+    clsdk.retrieveSku(skuId, qf.build())
       .then((data) => {
-        let inventory = data.get('inventory');
-        ui.updateAvailabilityMessage(inventory)
-        if (inventory.available) {
-          ui.updateAddToBagSKU(skuId, skuName)
-          ui.enableAddToBag()
+
+        let skuAttributes = [
+          'id',
+          'code',
+          'inventory',
+          'prices.formatted_amount',
+          'prices.formatted_compare_at_amount',
+          'prices.amount_cents',
+          'prices.compare_at_amount_cents'
+        ]
+
+        let sku = data.get(skuAttributes)
+        ui.updatePrice(sku, priceContainerId)
+        ui.updateAvailabilityMessage(sku.inventory, availabilityMessageContainerId)
+        if (sku.inventory.available) {
+          ui.updateAddToBagSKU(skuId, skuName, skuReference, skuImageUrl, addToBagId)
+          ui.enableAddToBag(addToBagId)
         } else {
-          ui.disableAddToBag()
+          ui.disableAddToBag(addToBagId)
         }
       })
-  },
-
-  selectVariant: function(variant) {
-    switch(variant.tagName) {
-      case "INPUT":
-        switch(variant.type) {
-          case "radio":
-            variant.click()
-            break
-          case "hidden":
-            module.exports.getInventory(variant.value, variant.dataset.skuName)
-            break
-        }
-        break
-      case "OPTION":
-        let select = variant.parentNode
-        select.value = variant.value
-        select.dispatchEvent(new Event('change'))
-        break
-    }
   },
 
   createOrder: function() {
     clsdk.createOrder({
         type: 'orders',
-        shipping_country_code_lock: config.countryCode(),
-        language_code: config.languageCode(),
-        cart_url: config.cartUrl(),
-        return_url: config.returnUrl(),
-        privacy_url: config.privacyUrl(),
-        terms_url: config.termsUrl()
+        shipping_country_code_lock: config.countryCode,
+        language_code: config.languageCode,
+        cart_url: config.cartUrl,
+        return_url: config.returnUrl,
+        privacy_url: config.privacyUrl,
+        terms_url: config.termsUrl
       }
     ).then(data => {
       utils.setOrderToken(data.get('token'))
       return(data)
     })
+  },
+
+  getOrder: function() {
+
+    api = this
+
+    let qf = new clsdk.query.QueryFilter();
+
+    qf.include('line_items').filter('token', utils.getOrderToken())
+
+    return clsdk.listOrders(qf)
+      .then(function(response) {
+
+        if (response.get(['line_items']).length > 0) {
+          api.updateShoppingBagItems(response)
+          ui.updateShoppingBagSummary(response.dataset.data[0])
+          ui.updateShoppingBagCheckout(response)
+          if (response.get('skus_count') == 0) {
+            ui.clearShoppingBag()
+          }
+          return response;
+        }
+      }
+    )
   },
 
   refreshOrder: function() {
@@ -157,7 +206,7 @@ module.exports = {
     }
   },
 
-  createLineItem: function(orderId, skuId, skuName, skuImageUrl) {
+  createLineItem: function(orderId, skuId, skuName, skuReference, skuImageUrl) {
 
     return clsdk.createLineItem({
       data: {
@@ -165,6 +214,7 @@ module.exports = {
         attributes: {
           quantity: 1,
           name: skuName,
+          reference: skuReference,
           image_url: skuImageUrl,
           _update_quantity: 1
         },
@@ -203,7 +253,7 @@ module.exports = {
     })
   },
 
-  updateLineItemQty: function(lineItemId, quantity) {
+  updateLineItemQty: function(lineItemId, quantity, availabilityMessageContainer) {
     api = this
     api.updateLineItem(lineItemId, { quantity: quantity })
       .then(function(){
@@ -213,7 +263,9 @@ module.exports = {
         if (error) {
           switch(error.status) {
             case 422:
-              ui.displayShoppingBagUnavailableMessage()
+              if (availabilityMessageContainer) {
+                ui.displayUnavailableMessage(availabilityMessageContainer)
+              }
               break
           }
         }
@@ -237,6 +289,7 @@ module.exports = {
         'line_items.item_type',
         'line_items.image_url',
         'line_items.name',
+        'line_items.reference',
         'line_items.quantity',
         'line_items.formatted_unit_amount',
         'line_items.formatted_total_amount'
@@ -259,52 +312,70 @@ module.exports = {
 
               // image
               let shoppingBagItemImage = shoppingBagItem.querySelector('.clayer-shopping-bag-item-image')
-              shoppingBagItemImage.src = line_item.image_url
+              if (shoppingBagItemImage) {
+                shoppingBagItemImage.src = line_item.image_url
+              }
 
               // name
               let shoppingBagItemName = shoppingBagItem.querySelector('.clayer-shopping-bag-item-name')
-              shoppingBagItemName.innerHTML = line_item.name
+              if (shoppingBagItemName) {
+                shoppingBagItemName.innerHTML = line_item.name
+              }
+
+              // reference
+              let shoppingBagItemReference = shoppingBagItem.querySelector('.clayer-shopping-bag-item-reference')
+              if (shoppingBagItemReference) {
+                shoppingBagItemReference.innerHTML = line_item.reference
+              }
 
               // qty
               let shoppingBagItemQtyContainer = shoppingBagItem.querySelector('.clayer-shopping-bag-item-qty-container')
-              let qtySelect = document.createElement('select')
-              qtySelect.dataset.lineItemId = line_item.id
+              if (shoppingBagItemQtyContainer) {
+                let availabilityMessageContainer = shoppingBagItemQtyContainer.querySelector(".clayer-shopping-bag-item-availability-message-container")
 
-              for (qty = 1; qty <= 10; qty++) {
-                  let option = document.createElement("option")
-                  option.value = qty
-                  option.text = qty
-                  if (qty == line_item.quantity) {
-                    option.selected = true
-                  }
-                  qtySelect.appendChild(option)
+                let qtySelect = document.createElement('select')
+                qtySelect.dataset.lineItemId = line_item.id
+
+                for (qty = 1; qty <= 50; qty++) {
+                    let option = document.createElement("option")
+                    option.value = qty
+                    option.text = qty
+                    if (qty == line_item.quantity) {
+                      option.selected = true
+                    }
+                    qtySelect.appendChild(option)
+                }
+
+                qtySelect.addEventListener('change', function(event){
+                  api.updateLineItemQty(this.dataset.lineItemId, this.value, availabilityMessageContainer)
+                })
+                shoppingBagItemQtyContainer.insertBefore(qtySelect, shoppingBagItemQtyContainer.firstChild)
               }
-
-              qtySelect.addEventListener('change', function(event){
-                event.preventDefault()
-                event.stopPropagation()
-                api.updateLineItemQty(this.dataset.lineItemId, this.value)
-              })
-              shoppingBagItemQtyContainer.appendChild(qtySelect)
 
               // unit_amount
               let shoppingBagItemUnitAmount = shoppingBagItem.querySelector('.clayer-shopping-bag-item-unit-amount')
-              shoppingBagItemUnitAmount.innerHTML = line_item.formatted_unit_amount
+              if (shoppingBagItemUnitAmount) {
+                shoppingBagItemUnitAmount.innerHTML = line_item.formatted_unit_amount
+              }
 
               // total_amount
               let shoppingBagItemTotalAmount = shoppingBagItem.querySelector('.clayer-shopping-bag-item-total-amount')
-              shoppingBagItemTotalAmount.innerHTML = line_item.formatted_total_amount
+              if (shoppingBagItemTotalAmount) {
+                shoppingBagItemTotalAmount.innerHTML = line_item.formatted_total_amount
+              }
 
               // remove
               let shoppingBagItemRemove = shoppingBagItem.querySelector('.clayer-shopping-bag-item-remove')
-              shoppingBagItemRemove.dataset.lineItemId = line_item.id
-              shoppingBagItemRemove.addEventListener('click', function(event){
-                event.preventDefault()
-                event.stopPropagation()
-                api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
-                  api.getOrder()
+              if (shoppingBagItemRemove) {
+                shoppingBagItemRemove.dataset.lineItemId = line_item.id
+                shoppingBagItemRemove.addEventListener('click', function(event){
+                  event.preventDefault()
+                  event.stopPropagation()
+                  api.deleteLineItem(this.dataset.lineItemId).then(function(lineItem){
+                    api.getOrder()
+                  })
                 })
-              })
+              }
 
               shoppingBagItemsContainer.appendChild(shoppingBagItem)
 
@@ -313,30 +384,5 @@ module.exports = {
         }
       }
     }
-  },
-
-  getOrder: function() {
-
-    api = this
-
-    let qf = new clsdk.query.QueryFilter();
-
-    qf.include('line_items').filter('token', utils.getOrderToken())
-
-    return clsdk.listOrders(qf)
-      .then(function(response) {
-
-        if (response.get(['line_items']).length > 0) {
-          api.updateShoppingBagItems(response)
-          ui.hideShoppingBagUnavailableMessage() // refactor
-          ui.updateShoppingBagSummary(response.dataset.data[0])
-          ui.updateShoppingBagCheckout(response)
-          if (response.get('skus_count') == 0) {
-            ui.clearShoppingBag()
-          }
-          return response;
-        }
-      }
-    )
   }
 }
