@@ -143,9 +143,9 @@ module.exports = {
     let addToBag = document.querySelector(`#${addToBagId}`)
     if (addToBag) {
       addToBag.dataset.skuId = skuId
-      addToBag.dataset.skuName = skuName
-      addToBag.dataset.skuReference = skuReference
-      addToBag.dataset.skuImageUrl = skuImageUrl
+      if (skuName) addToBag.dataset.skuName = skuName
+      if (skuReference) addToBag.dataset.skuReference = skuReference
+      if (skuImageUrl) addToBag.dataset.skuImageUrl = skuImageUrl
     }
   },
   enableAddToBag: function(addToBagId) {

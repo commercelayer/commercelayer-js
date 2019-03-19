@@ -181,31 +181,34 @@ module.exports = {
 
   createLineItem: function(orderId, skuId, skuName, skuReference, skuImageUrl) {
 
-    return clsdk.createLineItem({
-      data: {
-        type: 'line_items',
-        attributes: {
-          quantity: 1,
-          name: skuName,
-          reference: skuReference,
-          image_url: skuImageUrl,
-          _update_quantity: 1
+    let lineItemData = {
+      type: 'line_items',
+      attributes: {
+        quantity: 1,
+        _update_quantity: 1
+      },
+      relationships: {
+        order: {
+          data: {
+            type: 'orders',
+            id: orderId
+          }
         },
-        relationships: {
-          order: {
-            data: {
-              type: 'orders',
-              id: orderId
-            }
-          },
-          item: {
-            data: {
-              type: 'skus',
-              id: skuId
-            }
+        item: {
+          data: {
+            type: 'skus',
+            id: skuId
           }
         }
       }
+    }
+
+    if (skuName) lineItemData.attributes.name = skuName
+    if (skuReference) lineItemData.attributes.reference = skuReference
+    if (skuImageUrl) lineItemData.attributes.image_url = skuImageUrl
+
+    return clsdk.createLineItem({
+      data: lineItemData
     })
     .then(function(response) {
       document.dispatchEvent(new Event('clayer-line-item-created'))
