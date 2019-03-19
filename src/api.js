@@ -21,7 +21,7 @@ module.exports = {
         .filter('codes', skuCodes.join(','))
         .include('prices')
 
-      clsdk.listSkus(qf.build())
+      clsdk.allSkus(qf.build())
         .then(data => {
 
           let skuAttributes = [
@@ -34,16 +34,7 @@ module.exports = {
           ]
 
           ui.updatePrices(data.get(skuAttributes))
-
-          let pageCount = data.dataset.meta.page_count;
-
-          if (pageCount > 1) {
-            for (p=2; p<=pageCount; p++) {
-              qf.pageNumber(p)
-              clsdk.listSkus(qf)
-                .then(data => ui.updatePrices(data.get(skuAttributes)))
-            }
-          }
+          document.dispatchEvent(new Event('clayer-prices-ready'))
         }
       )
     }
@@ -69,20 +60,10 @@ module.exports = {
         'code'
       ]
 
-      clsdk.listSkus(qf.build())
+      clsdk.allSkus(qf.build())
         .then(data => {
-
           ui.updateVariants(data.get(skuAttributes))
-
-          let pageCount = data.dataset.meta.page_count;
-
-          if (pageCount > 1) {
-            for (p=2; p<=pageCount; p++) {
-              qf.pageNumber(p)
-              clsdk.listSkus(qf)
-                .then(data => ui.updateVariants(data.get(skuAttributes)))
-            }
-          }
+          document.dispatchEvent(new Event('clayer-variants-ready'))
         }
       )
     }
@@ -108,20 +89,10 @@ module.exports = {
         'code'
       ]
 
-      clsdk.listSkus(qf.build())
+      clsdk.allSkus(qf.build())
         .then(data => {
-
           ui.updateAddToBags(data.get(skuAttributes))
-
-          let pageCount = data.dataset.meta.page_count;
-
-          if (pageCount > 1) {
-            for (p=2; p<=pageCount; p++) {
-              qf.pageNumber(p)
-              clsdk.listSkus(qf)
-                .then(data => ui.updateAddToBags(data.get(skuAttributes)))
-            }
-          }
+          document.dispatchEvent(new Event('clayer-add-to-bags-ready'))
         }
       )
     }
@@ -152,6 +123,7 @@ module.exports = {
         } else {
           ui.disableAddToBag(addToBagId)
         }
+        document.dispatchEvent(new Event('clayer-variant-selected'))
       })
   },
 
@@ -189,6 +161,7 @@ module.exports = {
           if (response.get('skus_count') == 0) {
             ui.clearShoppingBag()
           }
+          document.dispatchEvent(new Event('clayer-order-ready'))
           return response;
         }
       }
@@ -234,12 +207,17 @@ module.exports = {
         }
       }
     })
+    .then(function(response) {
+      document.dispatchEvent(new Event('clayer-line-item-created'))
+      return response
+    })
   },
 
   deleteLineItem: function(lineItemId) {
     return clsdk.deleteLineItem(lineItemId)
-      .then(function() {
-        return true
+      .then(function(response) {
+        document.dispatchEvent(new Event('clayer-line-item-deleted'))
+        return response
       })
   },
 
@@ -250,6 +228,10 @@ module.exports = {
         id: lineItemId,
         attributes: attributes
       }
+    })
+    .then(function(response) {
+      document.dispatchEvent(new Event('clayer-line-item-updated'))
+      return response
     })
   },
 
