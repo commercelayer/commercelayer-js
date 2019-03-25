@@ -21,7 +21,7 @@ module.exports = {
         .filter('codes', skuCodes.join(','))
         .include('prices')
 
-      clsdk.allSkus(qf.build())
+      clsdk.listSkus(qf.build())
         .then(data => {
 
           let skuAttributes = [
@@ -34,6 +34,17 @@ module.exports = {
           ]
 
           ui.updatePrices(data.get(skuAttributes))
+
+          let pageCount = data.dataset.meta.page_count;
+
+          if (pageCount > 1) {
+            for (p=2; p<=pageCount; p++) {
+              qf.pageNumber(p)
+              clsdk.listSkus(qf)
+                .then(data => ui.updatePrices(data.get(skuAttributes)))
+            }
+          }
+
           document.dispatchEvent(new Event('clayer-prices-ready'))
         }
       )
@@ -60,9 +71,19 @@ module.exports = {
         'code'
       ]
 
-      clsdk.allSkus(qf.build())
+      clsdk.listSkus(qf.build())
         .then(data => {
           ui.updateVariants(data.get(skuAttributes))
+
+          let pageCount = data.dataset.meta.page_count;
+
+          if (pageCount > 1) {
+            for (p=2; p<=pageCount; p++) {
+              qf.pageNumber(p)
+              clsdk.listSkus(qf)
+                .then(data => ui.updateVariants(data.get(skuAttributes)))
+            }
+          }
           document.dispatchEvent(new Event('clayer-variants-ready'))
         }
       )
@@ -89,9 +110,19 @@ module.exports = {
         'code'
       ]
 
-      clsdk.allSkus(qf.build())
+      clsdk.listSkus(qf.build())
         .then(data => {
           ui.updateAddToBags(data.get(skuAttributes))
+
+          let pageCount = data.dataset.meta.page_count;
+
+          if (pageCount > 1) {
+            for (p=2; p<=pageCount; p++) {
+              qf.pageNumber(p)
+              clsdk.listSkus(qf)
+                .then(data => ui.updateAddToBags(data.get(skuAttributes)))
+            }
+          }
           document.dispatchEvent(new Event('clayer-add-to-bags-ready'))
         }
       )
