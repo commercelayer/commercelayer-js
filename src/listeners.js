@@ -32,7 +32,7 @@ module.exports = {
 
         orderPromise.then(function(order){
 
-          api.createLineItem(order.get('id')[0], addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuReference, addToBag.dataset.skuImageUrl).then(function(lineItem){
+          api.createLineItem(order.id, addToBag.dataset.skuId, addToBag.dataset.skuName, addToBag.dataset.skuReference, addToBag.dataset.skuImageUrl).then(function(lineItem){
             api.getOrder()
             ui.openShoppingBag()
           })

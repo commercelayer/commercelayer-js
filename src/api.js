@@ -128,7 +128,7 @@ module.exports = {
   },
 
   createOrder: function() {
-    clsdk.createOrder({
+    return clsdk.createOrder({
         type: 'orders',
         shipping_country_code_lock: config.countryCode,
         language_code: config.languageCode,
@@ -137,9 +137,9 @@ module.exports = {
         privacy_url: config.privacyUrl,
         terms_url: config.termsUrl
       }
-    ).then(data => {
-      utils.setOrderToken(data.get('token'))
-      return(data)
+    ).then(response => {
+      utils.setOrderToken(response.dataset.data.attributes.token)
+      return(response.dataset.data)
     })
   },
 
@@ -162,7 +162,7 @@ module.exports = {
             ui.clearShoppingBag()
           }
           document.dispatchEvent(new Event('clayer-order-ready'))
-          return response;
+          return response.dataset.data[0];
         }
       }
     )
@@ -171,7 +171,7 @@ module.exports = {
   refreshOrder: function() {
     if (utils.getOrderToken()) {
       this.getOrder().then(function(order) {
-        if (order && order.get('status') == 'placed') {
+        if (order && order.attributes.status == 'placed') {
           utils.deleteOrderToken()
           ui.clearShoppingBag()
         }
