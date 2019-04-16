@@ -202,7 +202,7 @@ module.exports = {
   refreshOrder: function() {
     if (utils.getOrderToken()) {
       this.getOrder().then(function(order) {
-        if (order && order.attributes.status == 'placed') {
+        if (!order || order.attributes.status == 'placed') {
           utils.deleteOrderToken()
           ui.clearShoppingBag()
         }
