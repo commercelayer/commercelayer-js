@@ -113,11 +113,13 @@ module.exports = {
       })
     })
   },
-  updateVariants: function(skus) {
-    let allVariants = document.querySelectorAll('.clayer-variant')
-    allVariants.forEach(function (variant) {
-      disableElement(variant)
-    })
+  updateVariants: function(skus, clear) {
+    if (clear === true) {
+      let allVariants = document.querySelectorAll('.clayer-variant')
+      allVariants.forEach(function (variant) {
+        disableElement(variant)
+      })
+    }
     skus.forEach( function(sku){
       let variants = document.querySelectorAll('.clayer-variant[data-sku-code="' + sku.code + '"]')
       variants.forEach(function (variant) {

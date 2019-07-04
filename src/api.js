@@ -20,6 +20,7 @@ module.exports = {
       let qf = new clsdk.query.QueryFilter()
         .filter('codes', skuCodes.join(','))
         .include('prices')
+        .pageSize(25)
 
       clsdk.listSkus(qf.build())
         .then(data => {
@@ -65,6 +66,7 @@ module.exports = {
 
       let qf = new clsdk.query.QueryFilter()
         .filter('codes', skuCodes.join(','))
+        .pageSize(25)
 
       let skuAttributes = [
         'id',
@@ -73,7 +75,7 @@ module.exports = {
 
       clsdk.listSkus(qf.build())
         .then(data => {
-          ui.updateVariants(data.get(skuAttributes))
+          ui.updateVariants(data.get(skuAttributes), true)
 
           let pageCount = data.dataset.meta.page_count;
 
@@ -81,7 +83,7 @@ module.exports = {
             for (p=2; p<=pageCount; p++) {
               qf.pageNumber(p)
               clsdk.listSkus(qf)
-                .then(data => ui.updateVariants(data.get(skuAttributes)))
+                .then(data => ui.updateVariants(data.get(skuAttributes), false))
             }
           }
           document.dispatchEvent(new Event('clayer-variants-ready'))
@@ -104,6 +106,7 @@ module.exports = {
 
       let qf = new clsdk.query.QueryFilter()
         .filter('codes', skuCodes.join(','))
+        .pageSize(25)
 
       let skuAttributes = [
         'id',
@@ -130,7 +133,7 @@ module.exports = {
   },
 
   selectSku: function(skuId, skuName, skuReference, skuImageUrl, priceContainerId, availabilityMessageContainerId, addToBagId) {
-    let qf = new clsdk.query.QueryFilter().include('prices')
+    let qf = new clsdk.query.QueryFilter().include('prices').pageSize(25)
 
     clsdk.retrieveSku(skuId, qf.build())
       .then((data) => {
@@ -180,7 +183,7 @@ module.exports = {
 
     let qf = new clsdk.query.QueryFilter();
 
-    qf.include('line_items').filter('token', utils.getOrderToken())
+    qf.include('line_items').filter('token', utils.getOrderToken()).pageSize(25)
 
     return clsdk.listOrders(qf)
       .then(function(response) {
