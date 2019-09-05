@@ -1,18 +1,16 @@
 function initCommercelayer() {
-
   const api = require('./api')
   const listeners = require('./listeners')
   const config = require('./config')
   const clsdk = require('@commercelayer/sdk')
 
   exports.init = function() {
-
     clsdk.initialize({
-      client_id : config.clientId,
-      market_id : config.marketId,
-      base_url : config.baseUrl,
-      country_code : config.countryCode,
-      language_code : config.languageCode
+      client_id: config.clientId,
+      market_id: config.marketId,
+      base_url: config.baseUrl,
+      country_code: config.countryCode,
+      language_code: config.languageCode
     })
 
     clsdk.settings.debug = config.devSettings.debug
@@ -21,9 +19,11 @@ function initCommercelayer() {
 
     api.getPrices()
     api.getVariants()
+    api.getVariantsQuantity()
     api.getAddToBags()
 
     listeners.setupVariants()
+    listeners.setupAddVariantQuantity()
     listeners.setupAddToBags()
     listeners.setupShoppingBagToggles()
 
@@ -40,6 +40,7 @@ if (document.readyState == 'loading') {
       initCommercelayer()
     }
   })
-} else { // interactive or complete
+} else {
+  // interactive or complete
   initCommercelayer()
 }
