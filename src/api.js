@@ -43,6 +43,10 @@ module.exports = {
         }
 
         document.dispatchEvent(new Event("clayer-prices-ready"));
+
+        if (data.get(skuAttributes).length === 0) {
+          document.dispatchEvent(new Event("clayer-skus-empty"));
+        }
       });
     }
   },
