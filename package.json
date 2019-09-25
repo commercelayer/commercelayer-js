@@ -19,18 +19,24 @@
     "api"
   ],
   "author": "Filippo Conforti",
+  "contributors": [
+    {
+      "name": "Alessandro Casazza",
+      "email": "alessandro@commercelayer.io"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/commercelayer/commercelayer-js/issues"
   },
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
-    "@commercelayer/sdk": "^1.6.2",
-    "js-cookie": "^2.2.0",
-    "lodash": "^4.17.11"
+    "@commercelayer/sdk": "^1.6.3",
+    "js-cookie": "^2.2.1",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "webpack": "^4.28.4",
-    "webpack-cli": "^3.2.1"
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   }
 }
