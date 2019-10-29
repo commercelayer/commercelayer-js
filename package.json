@@ -1,6 +1,6 @@
 {
 	"name": "commercelayer",
-	"version": "1.9.16",
+	"version": "1.9.17",
 	"description": "The Official Commerce Layer JS library",
 	"main": "./src/main.js",
 	"scripts": {
@@ -12,7 +12,12 @@
 		"type": "git",
 		"url": "git+https://github.com/commercelayer/commercelayer-js.git"
 	},
-	"keywords": ["jamstack", "headless", "ecommerce", "api"],
+	"keywords": [
+		"jamstack",
+		"headless",
+		"ecommerce",
+		"api"
+	],
 	"author": "Filippo Conforti",
 	"contributors": [
 		{
