@@ -18,7 +18,23 @@ var prodConfig =  {
   }
 }
 
-module.exports = [
-  devConfig,
-  prodConfig
-]
+module.exports = {
+  ...devConfig,
+  ...prodConfig,
+  module: {
+    rules: [
+      {
+        test: /\.m?js$/,
+        //exclude: /(node_modules|bower_components)/,
+         exclude:[],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: ['@babel/plugin-proposal-object-rest-spread']
+          }
+        }
+      }
+    ]
+  }
+}
