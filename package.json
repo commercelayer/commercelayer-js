@@ -1,46 +1,46 @@
 {
-	"name": "commercelayer",
-	"version": "1.9.18",
-	"description": "The Official Commerce Layer JS library",
-	"main": "./src/main.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "webpack --progress",
-		"watch": "webpack --progress --watch"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/commercelayer/commercelayer-js.git"
-	},
-	"keywords": [
-		"jamstack",
-		"headless",
-		"ecommerce",
-		"api"
-	],
-	"author": "Filippo Conforti",
-	"contributors": [
-		{
-			"name": "Alessandro Casazza",
-			"email": "alessandro@commercelayer.io"
-		}
-	],
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/commercelayer/commercelayer-js/issues"
-	},
-	"homepage": "https://github.com/commercelayer/commercelayer-js#readme",
-	"dependencies": {
-		"@commercelayer/sdk": "^1.6.3",
-		"js-cookie": "^2.2.1",
-		"lodash": "^4.17.15"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.7.0",
-		"@babel/plugin-proposal-object-rest-spread": "^7.6.2",
-		"@babel/preset-env": "^7.7.1",
-		"babel-loader": "^8.0.6",
-		"webpack": "^4.41.2",
-		"webpack-cli": "^3.3.10"
-	}
+  "name": "commercelayer",
+  "version": "1.9.19",
+  "description": "The Official Commerce Layer JS library",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress",
+    "watch": "webpack --progress --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/commercelayer/commercelayer-js.git"
+  },
+  "keywords": [
+    "jamstack",
+    "headless",
+    "ecommerce",
+    "api"
+  ],
+  "author": "Filippo Conforti",
+  "contributors": [
+    {
+      "name": "Alessandro Casazza",
+      "email": "alessandro@commercelayer.io"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/commercelayer/commercelayer-js/issues"
+  },
+  "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
+  "dependencies": {
+    "@commercelayer/sdk": "^1.6.3",
+    "js-cookie": "^2.2.1",
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.7.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/preset-env": "^7.7.1",
+    "babel-loader": "^8.0.6",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  }
 }
