@@ -3,6 +3,7 @@ function initCommercelayer() {
   const listeners = require('./listeners')
   const config = require('./config')
   const clsdk = require('@commercelayer/sdk')
+  const utils = require('./utils')
 
   exports.init = function() {
     clsdk.initialize({
@@ -12,7 +13,9 @@ function initCommercelayer() {
       country_code: config.countryCode,
       language_code: config.languageCode
     })
-
+    if (utils.getAccessTokenCookie()) {
+      clsdk.client.config.access_token = utils.getAccessTokenCookie()
+    }
     clsdk.settings.debug = config.devSettings.debug
     clsdk.settings.console = config.devSettings.console
     clsdk.settings.trace = config.devSettings.trace
