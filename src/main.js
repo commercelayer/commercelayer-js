@@ -33,6 +33,8 @@ function initCommercelayer() {
     api.refreshOrder()
   }
 
+  module.exports.refreshOrder = api.refreshOrder
+
   window.commercelayer = module.exports
   module.exports.init()
 }
