@@ -5,12 +5,11 @@ const clsdk = require('@commercelayer/sdk')
 
 module.exports = {
   getPrices: function() {
-    let prices = document.querySelectorAll('.clayer-price')
-
+    const prices = document.querySelectorAll('.clayer-price')
     if (prices.length > 0) {
       let skuCodes = []
 
-      prices.forEach(function(price) {
+      prices.forEach(price => {
         skuCodes.push(price.dataset.skuCode)
       })
 
@@ -28,7 +27,6 @@ module.exports = {
           'prices.amount_cents',
           'prices.compare_at_amount_cents'
         ]
-
         ui.updatePrices(data.get(skuAttributes))
         let pageCount = data.dataset.meta.page_count
 
@@ -398,6 +396,8 @@ module.exports = {
               )
               if (shoppingBagItemImage) {
                 shoppingBagItemImage.src = line_item.image_url
+                  ? line_item.image_url
+                  : ''
               }
 
               // name
@@ -443,8 +443,8 @@ module.exports = {
 
                 qtySelect.addEventListener('change', () => {
                   api.updateLineItemQty(
-                    this.dataset.lineItemId,
-                    this.value,
+                    qtySelect.dataset.lineItemId,
+                    qtySelect.value,
                     availabilityMessageContainer
                   )
                 })

@@ -12,12 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/commercelayer/commercelayer-js.git"
   },
-  "keywords": [
-    "jamstack",
-    "headless",
-    "ecommerce",
-    "api"
-  ],
+  "keywords": ["jamstack", "headless", "ecommerce", "api"],
   "author": "Filippo Conforti",
   "contributors": [
     {
@@ -32,8 +27,10 @@
   "homepage": "https://github.com/commercelayer/commercelayer-js#readme",
   "dependencies": {
     "@commercelayer/sdk": "^1.6.3",
+    "core-js": "^3.4.6",
     "js-cookie": "^2.2.1",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "regenerator-runtime": "^0.13.3"
   },
   "devDependencies": {
     "@babel/core": "^7.7.0",
