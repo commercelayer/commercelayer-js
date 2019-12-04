@@ -239,7 +239,7 @@ module.exports = {
         api.updateShoppingBagItems(response)
         ui.updateShoppingBagSummary(response.dataset.data)
         ui.updateShoppingBagCheckout(response)
-        if (response.dataset.data.attributes.skus_count === 0) {
+        if (response.dataset.data.attributes.total_amount_cents === 0) {
           ui.clearShoppingBag()
         }
         document.dispatchEvent(new Event('clayer-order-ready'))

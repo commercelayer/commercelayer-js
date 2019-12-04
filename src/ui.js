@@ -28,7 +28,7 @@ function hideElement(element) {
 }
 
 function setElementHTML(parent, selector, html) {
-  element = parent.querySelector(selector)
+  const element = parent.querySelector(selector)
   if (element) {
     element.innerHTML = html
   }
@@ -99,13 +99,15 @@ function updateShoppingBagDiscount(order) {
 
 module.exports = {
   updatePrice(sku, priceContainerId) {
-    priceContainer = document.querySelector(`#${priceContainerId}`)
+    const priceContainer = document.querySelector(`#${priceContainerId}`)
     if (priceContainer) {
-      priceAmount = priceContainer.querySelector('.amount')
+      const priceAmount = priceContainer.querySelector('.amount')
       if (priceAmount) {
         priceAmount.innerHTML = sku.prices[0].formatted_amount
       }
-      priceCompareAmount = priceContainer.querySelector('.compare-at-amount')
+      const priceCompareAmount = priceContainer.querySelector(
+        '.compare-at-amount'
+      )
       if (priceCompareAmount) {
         if (
           sku.prices[0].compare_at_amount_cents > sku.prices[0].amount_cents
@@ -118,13 +120,13 @@ module.exports = {
   },
   updatePrices: function(skus) {
     skus.forEach(function(sku) {
-      priceAmounts = document.querySelectorAll(
+      const priceAmounts = document.querySelectorAll(
         '[data-sku-code="' + sku.code + '"] > .amount'
       )
       priceAmounts.forEach(function(priceAmount) {
         priceAmount.innerHTML = sku.prices[0].formatted_amount
       })
-      priceCompareAmounts = document.querySelectorAll(
+      const priceCompareAmounts = document.querySelectorAll(
         '[data-sku-code="' + sku.code + '"] > .compare-at-amount'
       )
       priceCompareAmounts.forEach(function(priceCompareAmount) {
@@ -278,7 +280,7 @@ module.exports = {
       '.clayer-shopping-bag-checkout'
     )
     shoppingBagCheckouts.forEach(function(shoppingBagCheckout) {
-      normalized_order = order.get(['line_items.id', 'checkout_url'])
+      const normalized_order = order.get(['line_items.id', 'checkout_url'])
 
       if (normalized_order.line_items) {
         enableElement(shoppingBagCheckout)
@@ -290,8 +292,14 @@ module.exports = {
     })
   },
   displayAvailableMessage: function(container, stockLevel) {
-    dlt = stockLevel.delivery_lead_times[0]
-    qty = stockLevel.quantity
+    const dlt = stockLevel.delivery_lead_times[0]
+    const qty = stockLevel.quantity
+    let minDays = ''
+    let maxDays = ''
+    let minHours = ''
+    let maxHours = ''
+    let shippingMethodName = ''
+    let shippingMethodPrice = ''
     if (dlt) {
       minDays = dlt.min.days
       maxDays = dlt.max.days
