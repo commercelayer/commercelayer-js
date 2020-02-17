@@ -227,25 +227,39 @@ module.exports = {
         return response.dataset.data
       })
   },
-
+  cleanOrder: function() {
+    utils.deleteOrderToken()
+    ui.clearShoppingBag()
+  },
   getOrder: function() {
     const api = this
 
     let qf = new clsdk.query.QueryFilter()
 
     qf.include('line_items')
-    return clsdk.retrieveOrder(utils.getOrderToken(), qf).then(response => {
-      if (response.dataset.data.attributes) {
-        api.updateShoppingBagItems(response)
-        ui.updateShoppingBagSummary(response.dataset.data)
-        ui.updateShoppingBagCheckout(response)
-        if (response.dataset.data.attributes.total_amount_cents === 0) {
-          ui.clearShoppingBag()
+    return clsdk
+      .retrieveOrder(utils.getOrderToken(), qf)
+      .then(response => {
+        if (response.dataset.data.attributes) {
+          if (response.dataset.data.attributes.total_amount_cents === 0) {
+            ui.clearShoppingBag()
+          }
+          if (response.dataset.data.attributes.status === 'placed') {
+            api.cleanOrder()
+            return null
+          }
+          api.updateShoppingBagItems(response)
+          ui.updateShoppingBagSummary(response.dataset.data)
+          ui.updateShoppingBagCheckout(response)
+          document.dispatchEvent(new Event('clayer-order-ready'))
+          return response.dataset.data
         }
-        document.dispatchEvent(new Event('clayer-order-ready'))
-        return response.dataset.data
-      }
-    })
+      })
+      .catch(e => {
+        if (e.code === 'UNAUTHORIZED') {
+          api.cleanOrder()
+        }
+      })
   },
 
   refreshOrder: function() {
